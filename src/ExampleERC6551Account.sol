@@ -34,22 +34,13 @@ contract ExampleERC6551Account is IERC165, IERC6551Account {
     function token()
         external
         view
-        returns (
-            uint256 chainId,
-            address tokenContract,
-            uint256 tokenId
-        )
+        returns (uint256 chainId, address tokenContract, uint256 tokenId)
     {
-        return
-            abi.decode(
-                Bytecode.codeAt(address(this), 46, 142),
-                (uint256, address, uint256)
-            );
+        return abi.decode(Bytecode.codeAt(address(this), 46, 142), (uint256, address, uint256));
     }
 
     function owner() public view returns (address) {
-        (uint256 chainId, address tokenContract, uint256 tokenId) = this
-            .token();
+        (uint256 chainId, address tokenContract, uint256 tokenId) = this.token();
         if (chainId != block.chainid) return address(0);
 
         return IERC721(tokenContract).ownerOf(tokenId);

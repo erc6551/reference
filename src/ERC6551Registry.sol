@@ -19,15 +19,8 @@ contract ERC6551Registry is IERC6551Registry {
         uint256 seed,
         bytes calldata initData
     ) external returns (address) {
-        bytes32 salt = keccak256(
-            abi.encode(chainId, tokenContract, tokenId, seed)
-        );
-        bytes memory code = _creationCode(
-            implementation,
-            chainId,
-            tokenContract,
-            tokenId
-        );
+        bytes32 salt = keccak256(abi.encode(chainId, tokenContract, tokenId, seed));
+        bytes memory code = _creationCode(implementation, chainId, tokenContract, tokenId);
 
         address _account = Create2.deploy(0, salt, code);
 
@@ -43,14 +36,7 @@ contract ERC6551Registry is IERC6551Registry {
 
         if (!isValidImplementation) revert InvalidImplementation();
 
-        emit AccountCreated(
-            _account,
-            implementation,
-            chainId,
-            tokenContract,
-            tokenId,
-            seed
-        );
+        emit AccountCreated(_account, implementation, chainId, tokenContract, tokenId, seed);
 
         return _account;
     }
@@ -62,9 +48,7 @@ contract ERC6551Registry is IERC6551Registry {
         uint256 tokenId,
         uint256 seed
     ) external view returns (address) {
-        bytes32 salt = keccak256(
-            abi.encode(chainId, tokenContract, tokenId, seed)
-        );
+        bytes32 salt = keccak256(abi.encode(chainId, tokenContract, tokenId, seed));
         bytes32 bytecodeHash = keccak256(
             _creationCode(implementation, chainId, tokenContract, tokenId)
         );
