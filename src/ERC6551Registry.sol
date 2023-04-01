@@ -9,21 +9,19 @@ import "./interfaces/IERC6551Account.sol";
 
 contract ERC6551Registry is IERC6551Registry {
     error InvalidImplementation();
+    error InitializationFailed();
 
     function createAccount(
         address implementation,
         uint256 chainId,
         address tokenContract,
-        uint256 tokenId
+        uint256 tokenId,
+        uint256 seed,
+        bytes calldata initData
     ) external returns (address) {
-        bool isValidImplementation = ERC165Checker.supportsInterface(
-            implementation,
-            type(IERC6551Account).interfaceId
+        bytes32 salt = keccak256(
+            abi.encode(chainId, tokenContract, tokenId, seed)
         );
-
-        if (!isValidImplementation) revert InvalidImplementation();
-
-        bytes32 salt = keccak256(abi.encode(chainId, tokenContract, tokenId));
         bytes memory code = _creationCode(
             implementation,
             chainId,
@@ -31,16 +29,42 @@ contract ERC6551Registry is IERC6551Registry {
             tokenId
         );
 
-        return Create2.deploy(0, salt, code);
+        address _account = Create2.deploy(0, salt, code);
+
+        bool isValidImplementation = ERC165Checker.supportsInterface(
+            _account,
+            type(IERC6551Account).interfaceId
+        );
+
+        if (!isValidImplementation) revert InvalidImplementation();
+
+        if (initData.length != 0) {
+            (bool success, ) = _account.call(initData);
+            if (!success) revert InitializationFailed();
+        }
+
+        emit AccountCreated(
+            _account,
+            implementation,
+            chainId,
+            tokenContract,
+            tokenId,
+            seed
+        );
+
+        return _account;
     }
 
     function account(
         address implementation,
         uint256 chainId,
         address tokenContract,
-        uint256 tokenId
+        uint256 tokenId,
+        uint256 seed
     ) external view returns (address) {
-        bytes32 salt = keccak256(abi.encode(chainId, tokenContract, tokenId));
+        bytes32 salt = keccak256(
+            abi.encode(chainId, tokenContract, tokenId, seed)
+        );
         bytes32 bytecodeHash = keccak256(
             _creationCode(implementation, chainId, tokenContract, tokenId)
         );
