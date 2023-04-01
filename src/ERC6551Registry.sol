@@ -31,17 +31,17 @@ contract ERC6551Registry is IERC6551Registry {
 
         address _account = Create2.deploy(0, salt, code);
 
+        if (initData.length != 0) {
+            (bool success, ) = _account.call(initData);
+            if (!success) revert InitializationFailed();
+        }
+
         bool isValidImplementation = ERC165Checker.supportsInterface(
             _account,
             type(IERC6551Account).interfaceId
         );
 
         if (!isValidImplementation) revert InvalidImplementation();
-
-        if (initData.length != 0) {
-            (bool success, ) = _account.call(initData);
-            if (!success) revert InitializationFailed();
-        }
 
         emit AccountCreated(
             _account,
