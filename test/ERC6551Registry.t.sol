@@ -22,7 +22,9 @@ contract AccountTest is Test {
             address(implementation),
             block.chainid,
             address(0),
-            0
+            0,
+            0,
+            ""
         );
 
         assertTrue(deployedAccount != address(0));
@@ -31,6 +33,7 @@ contract AccountTest is Test {
             address(implementation),
             block.chainid,
             address(0),
+            0,
             0
         );
 
@@ -46,7 +49,9 @@ contract AccountTest is Test {
             address(implementation),
             block.chainid,
             address(nft),
-            1
+            1,
+            0,
+            ""
         );
 
         assertTrue(account != address(0));
@@ -55,14 +60,12 @@ contract AccountTest is Test {
 
         vm.deal(account, 1 ether);
 
+        IERC6551Account accountInstance = IERC6551Account(payable(account));
         vm.prank(vm.addr(1));
-        IERC6551Account(payable(account)).executeCall(
-            payable(vm.addr(2)),
-            0.5 ether,
-            ""
-        );
+        accountInstance.executeCall(payable(vm.addr(2)), 0.5 ether, "");
 
         assertEq(account.balance, 0.5 ether);
         assertEq(vm.addr(2).balance, 0.5 ether);
+        assertEq(accountInstance.nonce(), 1);
     }
 }

@@ -8,6 +8,8 @@ import "sstore2/utils/Bytecode.sol";
 import "./interfaces/IERC6551Account.sol";
 
 contract ExampleERC6551Account is IERC165, IERC6551Account {
+    uint256 public nonce;
+
     receive() external payable {}
 
     function executeCall(
@@ -19,6 +21,8 @@ contract ExampleERC6551Account is IERC165, IERC6551Account {
 
         bool success;
         (success, result) = to.call{value: value}(data);
+
+        ++nonce;
 
         if (!success) {
             assembly {
