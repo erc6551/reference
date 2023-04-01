@@ -3,11 +3,13 @@ pragma solidity ^0.8.13;
 
 import "openzeppelin-contracts/utils/introspection/IERC165.sol";
 import "openzeppelin-contracts/token/ERC721/IERC721.sol";
+import "openzeppelin-contracts/interfaces/IERC1271.sol";
+import "openzeppelin-contracts/utils/cryptography/SignatureChecker.sol";
 import "sstore2/utils/Bytecode.sol";
 
 import "./interfaces/IERC6551Account.sol";
 
-contract ExampleERC6551Account is IERC165, IERC6551Account {
+contract ExampleERC6551Account is IERC165, IERC1271, IERC6551Account {
     uint256 public nonce;
 
     receive() external payable {}
@@ -49,5 +51,22 @@ contract ExampleERC6551Account is IERC165, IERC6551Account {
     function supportsInterface(bytes4 interfaceId) public pure returns (bool) {
         return (interfaceId == type(IERC165).interfaceId ||
             interfaceId == type(IERC6551Account).interfaceId);
+    }
+
+    function isValidSignature(bytes32 hash, bytes memory signature)
+        external
+        view
+        returns (bytes4 magicValue)
+    {
+        bool isValid = SignatureChecker.isValidSignatureNow(
+            owner(),
+            hash,
+            signature
+        );
+        if (isValid) {
+            return IERC1271.isValidSignature.selector;
+        }
+
+        return "";
     }
 }
