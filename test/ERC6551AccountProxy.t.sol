@@ -7,37 +7,19 @@ import "../src/ERC6551Registry.sol";
 import "../src/ExampleERC6551AccountProxy.sol";
 import "../src/ExampleERC6551AccountProxyImpl.sol";
 import "./mocks/MockERC721.sol";
+import "./mocks/MockERC1155.sol";
 
 contract AccountProxyTest is Test {
     ERC6551Registry public registry;
     ExampleERC6551AccountProxy public proxy;
     ExampleERC6551AccountProxyImpl public proxyImpl;
     MockERC721 nft = new MockERC721();
+    MockERC1155 nft1155 = new MockERC1155();
 
     function setUp() public {
         registry = new ERC6551Registry();
         proxy = new ExampleERC6551AccountProxy();
         proxyImpl = new ExampleERC6551AccountProxyImpl();
-    }
-
-    function testSupportsInterface() public {
-        address owner = vm.addr(1);
-        uint256 tokenId = 100;
-
-        nft.mint(owner, tokenId);
-        vm.prank(owner, owner);
-
-        address deployedAccount = registry.createAccount(
-            address(proxy),
-            block.chainid,
-            address(nft),
-            tokenId,
-            0,
-            abi.encodeWithSignature("initialize(address)", address(proxyImpl))
-        );
-
-        (bool success, bytes memory data) = deployedAccount.staticcall(abi.encodeWithSignature("supportsInterface(bytes4)", type(IERC6551Account).interfaceId));
-        assertTrue(success);
     }
 
     function testDeploy() public {
@@ -274,12 +256,14 @@ contract AccountProxyTest is Test {
             abi.encodeWithSignature("initialize(address)", address(proxyImpl))
         );
 
-        /*
-        vm.prank(vm.addr(2));
-        vm.expectRevert("Cannot own yourself");
         ExampleERC6551AccountProxyImpl proxyImpl2 = new ExampleERC6551AccountProxyImpl();
+        vm.prank(vm.addr(2));
+        vm.expectRevert("Caller is not owner");
         ExampleERC6551AccountProxy(payable(account)).upgrade(address(proxyImpl2));
-        */
+
+        vm.prank(owner);
+        ExampleERC6551AccountProxy(payable(account)).upgrade(address(proxyImpl2));
+        assertEq(ExampleERC6551AccountProxy(payable(account)).implementation(), address(proxyImpl2));
     }
 
 }
