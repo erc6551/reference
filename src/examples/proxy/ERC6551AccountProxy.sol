@@ -15,8 +15,14 @@ import "../../lib/ERC6551AccountByteCode.sol";
  * ERC6551Account implementation that is an upgradeable proxy
  */
 contract ERC6551AccountProxy is Initializable, Proxy {
-    // Nonce is defined at the proxy level because it needs to be incremented
-    // when the implementation is upgraded.
+    /**
+     * @dev nonce is defined at the proxy level because it needs to be incremented
+     *      when the implementation is upgraded.
+     * note: nonce should also be incremented by the implementation whenever executeCall
+     *       is called, or whenever state is changed.  A bad implementation could
+     *       manipulate the nonce in malicious ways though, so it is up to a proxy
+     *       implementer to provide additional checks as necessary.
+     */
     uint256 public nonce;
 
     constructor() {
@@ -32,8 +38,10 @@ contract ERC6551AccountProxy is Initializable, Proxy {
         (uint256 chainId, address contractAddress, uint256 tokenId) = ERC6551AccountByteCode
             .token();
 
-        // We require that only the token owner can initialize the proxy, otherwise
-        // the proxy is subject to a front-running attack.
+        /**
+         * @dev We require that only the token owner can initialize the proxy, otherwise
+         *      the proxy is subject to a front-running attack.
+         */
         require(
             chainId == block.chainid && IERC721(contractAddress).ownerOf(tokenId) == tx.origin,
             "Not owner of token"
