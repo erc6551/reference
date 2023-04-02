@@ -178,7 +178,11 @@ contract ERC6551AccountProxy is Initializable, IERC1271, IERC165 {
         bytes32 hash,
         bytes memory signature
     ) external view returns (bytes4 magicValue) {
-        bool isValid = SignatureChecker.isValidSignatureNow(IERC6551AccountProxy(address(this))._owner(), hash, signature);
+        bool isValid = SignatureChecker.isValidSignatureNow(
+            IERC6551AccountProxy(address(this))._owner(),
+            hash,
+            signature
+        );
         if (isValid) {
             return IERC1271.isValidSignature.selector;
         }

@@ -51,8 +51,7 @@ contract AccountProxyTest is Test {
 
         assertEq(predictedAccount, deployedAccount);
 
-        address implementation = ERC6551AccountProxy(payable(deployedAccount))
-            .implementation();
+        address implementation = ERC6551AccountProxy(payable(deployedAccount)).implementation();
         assertEq(implementation, address(proxyImpl));
 
         // Can't be deployed twice
@@ -256,10 +255,7 @@ contract AccountProxyTest is Test {
 
         vm.prank(owner);
         ERC6551AccountProxy(payable(account)).upgrade(address(proxyImpl2));
-        assertEq(
-            ERC6551AccountProxy(payable(account)).implementation(),
-            address(proxyImpl2)
-        );
+        assertEq(ERC6551AccountProxy(payable(account)).implementation(), address(proxyImpl2));
     }
 
     function testERC721Receive() public {
