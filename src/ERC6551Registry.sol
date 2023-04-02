@@ -11,25 +11,23 @@ contract ERC6551Registry is IERC6551Registry {
     error InvalidImplementation();
     error InitializationFailed();
 
+    bytes constant creationCode =
+        hex"6044603d608081019182918101608060a0820191016000396000517f360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc556000396000f3fe600036818037808036817f360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc545af43d82803e156039573d90f35b3d90fd";
+
     function createAccount(
         address implementation,
         uint256 chainId,
         address tokenContract,
         uint256 tokenId,
-        uint256 seed,
+        uint256 salt,
         bytes calldata initData
     ) external returns (address) {
-        bytes32 salt = keccak256(
-            abi.encode(chainId, tokenContract, tokenId, seed)
-        );
-        bytes memory code = _creationCode(
-            implementation,
-            chainId,
-            tokenContract,
-            tokenId
+        bytes memory code = abi.encodePacked(
+            creationCode,
+            abi.encode(salt, chainId, tokenContract, tokenId, implementation)
         );
 
-        address _account = Create2.deploy(0, salt, code);
+        address _account = Create2.deploy(0, bytes32(salt), code);
 
         if (initData.length != 0) {
             (bool success, ) = _account.call(initData);
@@ -49,7 +47,7 @@ contract ERC6551Registry is IERC6551Registry {
             chainId,
             tokenContract,
             tokenId,
-            seed
+            salt
         );
 
         return _account;
@@ -60,30 +58,21 @@ contract ERC6551Registry is IERC6551Registry {
         uint256 chainId,
         address tokenContract,
         uint256 tokenId,
-        uint256 seed
+        uint256 salt
     ) external view returns (address) {
-        bytes32 salt = keccak256(
-            abi.encode(chainId, tokenContract, tokenId, seed)
-        );
         bytes32 bytecodeHash = keccak256(
-            _creationCode(implementation, chainId, tokenContract, tokenId)
+            abi.encodePacked(
+                creationCode,
+                abi.encode(
+                    salt,
+                    chainId,
+                    tokenContract,
+                    tokenId,
+                    implementation
+                )
+            )
         );
 
-        return Create2.computeAddress(salt, bytecodeHash);
-    }
-
-    function _creationCode(
-        address implementation,
-        uint256 chainId,
-        address tokenContract,
-        uint256 tokenId
-    ) public pure returns (bytes memory) {
-        return
-            abi.encodePacked(
-                hex"3d608e80600a3d3981f3363d3d373d3d3d363d73",
-                implementation,
-                hex"5af43d82803e903d91602b57fd5bf300",
-                abi.encode(chainId, tokenContract, tokenId)
-            );
+        return Create2.computeAddress(bytes32(salt), bytecodeHash);
     }
 }

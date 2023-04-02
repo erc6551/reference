@@ -8,7 +8,7 @@ interface IERC6551Registry {
         uint256 chainId,
         address tokenContract,
         uint256 tokenId,
-        uint256 seed
+        uint256 salt
     );
 
     function createAccount(
@@ -25,6 +25,6 @@ interface IERC6551Registry {
         uint256 chainId,
         address tokenContract,
         uint256 tokenId,
-        uint256 seed
+        uint256 salt
     ) external view returns (address);
 }

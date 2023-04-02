@@ -42,9 +42,10 @@ contract ExampleERC6551Account is IERC165, IERC1271, IERC6551Account {
             uint256 tokenId
         )
     {
+        uint256 length = address(this).code.length;
         return
             abi.decode(
-                Bytecode.codeAt(address(this), 46, 142),
+                Bytecode.codeAt(address(this), length - 0x60, length),
                 (uint256, address, uint256)
             );
     }
