@@ -56,17 +56,18 @@ library ERC6551AccountByteCode {
     }
 
     function createCode(
-        address implementation,
-        uint256 chainId,
-        address tokenContract,
-        uint256 tokenId
+        address implementation_,
+        uint256 chainId_,
+        address tokenContract_,
+        uint256 tokenId_,
+        uint256 seed_
     ) internal pure returns (bytes memory) {
         return
             abi.encodePacked(
                 hex"3d608e80600a3d3981f3363d3d373d3d3d363d73",
-                implementation,
+                implementation_,
                 hex"5af43d82803e903d91602b57fd5bf300",
-                abi.encode(chainId, tokenContract, tokenId)
+                abi.encode(chainId_, tokenContract_, tokenId_, seed_)
             );
     }
 
@@ -80,5 +81,9 @@ library ERC6551AccountByteCode {
         )
     {
         return abi.decode(codeAt(address(this), 46, 142), (uint256, address, uint256));
+    }
+
+    function seed() internal view returns (uint256) {
+        return abi.decode(codeAt(address(this), 142, 174), (uint256));
     }
 }

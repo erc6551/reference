@@ -25,7 +25,8 @@ contract ERC6551Registry is IERC6551Registry {
             implementation,
             chainId,
             tokenContract,
-            tokenId
+            tokenId,
+            seed
         );
 
         address _account = Create2.deploy(0, salt, code);
@@ -56,7 +57,7 @@ contract ERC6551Registry is IERC6551Registry {
     ) external view returns (address) {
         bytes32 salt = keccak256(abi.encode(chainId, tokenContract, tokenId, seed));
         bytes32 bytecodeHash = keccak256(
-            ERC6551AccountByteCode.createCode(implementation, chainId, tokenContract, tokenId)
+            ERC6551AccountByteCode.createCode(implementation, chainId, tokenContract, tokenId, seed)
         );
 
         return Create2.computeAddress(salt, bytecodeHash);
