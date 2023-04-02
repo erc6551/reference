@@ -10,14 +10,14 @@ import "openzeppelin-contracts/token/ERC721/IERC721.sol";
 import "openzeppelin-contracts/token/ERC721/IERC721Receiver.sol";
 import "openzeppelin-contracts/token/ERC1155/IERC1155Receiver.sol";
 
-import "./interfaces/IERC6551Account.sol";
-import "./lib/ERC6551AccountByteCode.sol";
+import "../../interfaces/IERC6551Account.sol";
+import "../../lib/ERC6551AccountByteCode.sol";
 
 /**
- * @title ExampleERC6551AccountProxyImpl
- * @notice A lightweight smart contract wallet implementation that can be used by ExampleERC6551AccountProxy
+ * @title ERC6551AccountProxyImpl
+ * @notice A lightweight smart contract wallet implementation that can be used by ERC6551AccountProxy
  */
-contract ExampleERC6551AccountProxyImpl is IERC165, IERC721Receiver, IERC1155Receiver {
+contract ERC6551AccountProxyImpl is IERC165, IERC721Receiver, IERC1155Receiver {
     // Padding for initializable values
     uint256 private _initializablePadding;
 

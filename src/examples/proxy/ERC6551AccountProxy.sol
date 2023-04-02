@@ -9,9 +9,9 @@ import "openzeppelin-contracts/utils/StorageSlot.sol";
 import "openzeppelin-contracts/proxy/utils/Initializable.sol";
 import "openzeppelin-contracts/utils/cryptography/SignatureChecker.sol";
 
-import "./lib/ERC6551AccountByteCode.sol";
+import "../../lib/ERC6551AccountByteCode.sol";
 
-interface IExampleERC6551AccountProxy {
+interface IERC6551AccountProxy {
     function _supportsInterface(bytes4) external view returns (bool);
 
     function _owner() external view returns (address);
@@ -20,7 +20,7 @@ interface IExampleERC6551AccountProxy {
 /**
  * ERC6551Account implementation that is an upgradeable proxy
  */
-contract ExampleERC6551AccountProxy is Initializable {
+contract ERC6551AccountProxy is Initializable {
     uint256 public nonce;
 
     constructor() {
@@ -132,12 +132,12 @@ contract ExampleERC6551AccountProxy is Initializable {
      */
     function owner() external view returns (address) {
         // We do this in order to do a view delegatecall
-        return IExampleERC6551AccountProxy(address(this))._owner();
+        return IERC6551AccountProxy(address(this))._owner();
     }
 
     function supportsInterface(bytes4 interfaceId) external view returns (bool) {
         // We do this in order to do a view delegatecall
-        return IExampleERC6551AccountProxy(address(this))._supportsInterface(interfaceId);
+        return IERC6551AccountProxy(address(this))._supportsInterface(interfaceId);
     }
 
     function _owner() external returns (address) {

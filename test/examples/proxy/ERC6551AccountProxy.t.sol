@@ -3,23 +3,23 @@ pragma solidity ^0.8.13;
 
 import "forge-std/Test.sol";
 
-import "../src/ERC6551Registry.sol";
-import "../src/ExampleERC6551AccountProxy.sol";
-import "../src/ExampleERC6551AccountProxyImpl.sol";
-import "./mocks/MockERC721.sol";
-import "./mocks/MockERC1155.sol";
+import "../../../src/ERC6551Registry.sol";
+import "../../../src/examples/proxy/ERC6551AccountProxy.sol";
+import "../../../src/examples/proxy/ERC6551AccountProxyImpl.sol";
+import "../../mocks/MockERC721.sol";
+import "../../mocks/MockERC1155.sol";
 
 contract AccountProxyTest is Test {
     ERC6551Registry public registry;
-    ExampleERC6551AccountProxy public proxy;
-    ExampleERC6551AccountProxyImpl public proxyImpl;
+    ERC6551AccountProxy public proxy;
+    ERC6551AccountProxyImpl public proxyImpl;
     MockERC721 nft = new MockERC721();
     MockERC1155 nft1155 = new MockERC1155();
 
     function setUp() public {
         registry = new ERC6551Registry();
-        proxy = new ExampleERC6551AccountProxy();
-        proxyImpl = new ExampleERC6551AccountProxyImpl();
+        proxy = new ERC6551AccountProxy();
+        proxyImpl = new ERC6551AccountProxyImpl();
     }
 
     function testDeploy() public {
@@ -51,7 +51,7 @@ contract AccountProxyTest is Test {
 
         assertEq(predictedAccount, deployedAccount);
 
-        address implementation = ExampleERC6551AccountProxy(payable(deployedAccount))
+        address implementation = ERC6551AccountProxy(payable(deployedAccount))
             .implementation();
         assertEq(implementation, address(proxyImpl));
 
@@ -249,15 +249,15 @@ contract AccountProxyTest is Test {
             abi.encodeWithSignature("initialize(address)", address(proxyImpl))
         );
 
-        ExampleERC6551AccountProxyImpl proxyImpl2 = new ExampleERC6551AccountProxyImpl();
+        ERC6551AccountProxyImpl proxyImpl2 = new ERC6551AccountProxyImpl();
         vm.prank(vm.addr(2));
         vm.expectRevert("Caller is not owner");
-        ExampleERC6551AccountProxy(payable(account)).upgrade(address(proxyImpl2));
+        ERC6551AccountProxy(payable(account)).upgrade(address(proxyImpl2));
 
         vm.prank(owner);
-        ExampleERC6551AccountProxy(payable(account)).upgrade(address(proxyImpl2));
+        ERC6551AccountProxy(payable(account)).upgrade(address(proxyImpl2));
         assertEq(
-            ExampleERC6551AccountProxy(payable(account)).implementation(),
+            ERC6551AccountProxy(payable(account)).implementation(),
             address(proxyImpl2)
         );
     }
