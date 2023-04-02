@@ -28,6 +28,9 @@ contract ERC6551AccountProxy is Initializable {
     function initialize(address implementation_) public initializer {
         (uint256 chainId, address contractAddress, uint256 tokenId) = ERC6551AccountByteCode
             .token();
+
+        // We require that only the token owner can initialize the proxy, otherwise
+        // the proxy is subject to a front-running attack.
         require(
             chainId == block.chainid && IERC721(contractAddress).ownerOf(tokenId) == tx.origin,
             "Not owner of token"
@@ -104,7 +107,7 @@ contract ERC6551AccountProxy is Initializable {
      *
      * This function does not return to its internal call site, it will return directly to the external caller.
      */
-    function _fallback() internal virtual {
+    function _fallback() private {
         _delegate(_implementation());
     }
 
@@ -119,7 +122,7 @@ contract ERC6551AccountProxy is Initializable {
      * @dev Fallback function that delegates calls to the address returned by `_implementation()`. Will run if no other
      * function in the contract matches the call data.
      */
-    fallback() external payable virtual {
+    fallback() external payable {
         _fallback();
     }
 
@@ -127,7 +130,7 @@ contract ERC6551AccountProxy is Initializable {
      * @dev Fallback function that delegates calls to the address returned by `_implementation()`. Will run if call data
      * is empty.
      */
-    receive() external payable virtual {
+    receive() external payable {
         _fallback();
     }
 }
