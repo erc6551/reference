@@ -51,24 +51,17 @@ contract AccountProxyTest is Test {
 
         assertEq(predictedAccount, deployedAccount);
 
-        address implementation = ExampleERC6551AccountProxy(payable(deployedAccount)).implementation();
+        address implementation = ExampleERC6551AccountProxy(payable(deployedAccount))
+            .implementation();
         assertEq(implementation, address(proxyImpl));
 
         // Can't be deployed twice
         vm.expectRevert("Create2: Failed on deploy");
-        registry.createAccount(
-            address(proxy),
-            block.chainid,
-            address(nft),
-            tokenId,
-            0,
-            ""
-        );
+        registry.createAccount(address(proxy), block.chainid, address(nft), tokenId, 0, "");
 
         // Can't be initialized twice
         vm.expectRevert("Initializable: contract is already initialized");
         deployedAccount.call(abi.encodeWithSignature("initialize(address)", address(proxyImpl)));
-
     }
 
     function testTokenAndOwnership() public {
@@ -263,7 +256,62 @@ contract AccountProxyTest is Test {
 
         vm.prank(owner);
         ExampleERC6551AccountProxy(payable(account)).upgrade(address(proxyImpl2));
-        assertEq(ExampleERC6551AccountProxy(payable(account)).implementation(), address(proxyImpl2));
+        assertEq(
+            ExampleERC6551AccountProxy(payable(account)).implementation(),
+            address(proxyImpl2)
+        );
     }
 
+    function testERC721Receive() public {
+        address owner = vm.addr(1);
+        uint256 tokenId = 100;
+
+        nft.mint(owner, tokenId);
+
+        vm.prank(owner, owner);
+        address account = registry.createAccount(
+            address(proxy),
+            block.chainid,
+            address(nft),
+            tokenId,
+            0,
+            abi.encodeWithSignature("initialize(address)", address(proxyImpl))
+        );
+
+        address otherOwner = vm.addr(2);
+        uint256 otherTokenId = 200;
+        nft.mint(otherOwner, otherTokenId);
+        vm.prank(otherOwner);
+        nft.safeTransferFrom(otherOwner, account, otherTokenId);
+        assertEq(nft.balanceOf(account), 1);
+        assertEq(nft.ownerOf(otherTokenId), account);
+    }
+
+    function testERC1155Receive() public {
+        address owner = vm.addr(1);
+        uint256 tokenId = 100;
+
+        nft.mint(owner, tokenId);
+
+        vm.prank(owner, owner);
+        address account = registry.createAccount(
+            address(proxy),
+            block.chainid,
+            address(nft),
+            tokenId,
+            0,
+            abi.encodeWithSignature("initialize(address)", address(proxyImpl))
+        );
+
+        uint256 tokenId1155 = 200;
+        uint256 amount1155 = 10;
+        address otherOwner = vm.addr(2);
+
+        nft1155.mint(otherOwner, tokenId1155, amount1155);
+
+        vm.prank(otherOwner);
+        nft1155.safeTransferFrom(otherOwner, account, tokenId1155, 2, "");
+        assertEq(nft1155.balanceOf(account, tokenId1155), 2);
+        assertEq(nft1155.balanceOf(otherOwner, tokenId1155), amount1155 - 2);
+    }
 }

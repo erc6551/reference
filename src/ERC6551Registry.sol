@@ -21,7 +21,12 @@ contract ERC6551Registry is IERC6551Registry {
         bytes calldata initData
     ) external returns (address) {
         bytes32 salt = keccak256(abi.encode(chainId, tokenContract, tokenId, seed));
-        bytes memory code = ERC6551AccountByteCode.createCode(implementation, chainId, tokenContract, tokenId);
+        bytes memory code = ERC6551AccountByteCode.createCode(
+            implementation,
+            chainId,
+            tokenContract,
+            tokenId
+        );
 
         address _account = Create2.deploy(0, salt, code);
 

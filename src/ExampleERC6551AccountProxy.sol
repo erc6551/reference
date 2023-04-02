@@ -13,6 +13,7 @@ import "./lib/ERC6551AccountByteCode.sol";
 
 interface IExampleERC6551AccountProxy {
     function _supportsInterface(bytes4) external view returns (bool);
+
     function _owner() external view returns (address);
 }
 
@@ -122,15 +123,7 @@ contract ExampleERC6551AccountProxy is Initializable {
     /**
      * @dev Returns the owner token chainId, contract address, and token id.
      */
-    function token()
-        external
-        view
-        returns (
-            uint256,
-            address,
-            uint256
-        )
-    {
+    function token() external view returns (uint256, address, uint256) {
         return ERC6551AccountByteCode.token();
     }
 

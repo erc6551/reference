@@ -53,16 +53,11 @@ contract ExampleERC6551Account is IERC165, IERC1271, IERC6551Account {
             interfaceId == type(IERC6551Account).interfaceId);
     }
 
-    function isValidSignature(bytes32 hash, bytes memory signature)
-        external
-        view
-        returns (bytes4 magicValue)
-    {
-        bool isValid = SignatureChecker.isValidSignatureNow(
-            owner(),
-            hash,
-            signature
-        );
+    function isValidSignature(
+        bytes32 hash,
+        bytes memory signature
+    ) external view returns (bytes4 magicValue) {
+        bool isValid = SignatureChecker.isValidSignatureNow(owner(), hash, signature);
         if (isValid) {
             return IERC1271.isValidSignature.selector;
         }

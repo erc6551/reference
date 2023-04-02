@@ -94,10 +94,10 @@ contract ExampleERC6551AccountProxyImpl is IERC165, IERC721Receiver, IERC1155Rec
      * @param receivedTokenAddress The address of the token being received.
      * @param receivedTokenId The ID of the token being received.
      */
-    function _revertIfOwnershipCycle(address receivedTokenAddress, uint256 receivedTokenId)
-        internal
-        view
-    {
+    function _revertIfOwnershipCycle(
+        address receivedTokenAddress,
+        uint256 receivedTokenId
+    ) internal view {
         address currentOwner = owner();
         require(currentOwner != address(this), "Token in ownership chain");
 
