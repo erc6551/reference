@@ -4,6 +4,8 @@ pragma solidity ^0.8.0;
 
 /// @author: manifold.xyz
 
+import "openzeppelin-contracts/interfaces/IERC1271.sol";
+import "openzeppelin-contracts/utils/cryptography/SignatureChecker.sol";
 import "openzeppelin-contracts/utils/introspection/IERC165.sol";
 import "openzeppelin-contracts/utils/introspection/ERC165Checker.sol";
 import "openzeppelin-contracts/token/ERC721/IERC721.sol";
@@ -17,7 +19,7 @@ import "../../lib/ERC6551AccountByteCode.sol";
  * @title ERC6551AccountProxyImpl
  * @notice A lightweight smart contract wallet implementation that can be used by ERC6551AccountProxy
  */
-contract ERC6551AccountProxyImpl is IERC165, IERC721Receiver, IERC1155Receiver {
+contract ERC6551AccountProxyImpl is IERC165, IERC1271, IERC721Receiver, IERC1155Receiver {
     // Padding for initializable values
     uint256 private _initializablePadding;
 
@@ -129,5 +131,23 @@ contract ERC6551AccountProxyImpl is IERC165, IERC721Receiver, IERC1155Receiver {
                 break;
             }
         }
+    }
+
+
+
+    function isValidSignature(
+        bytes32 hash,
+        bytes memory signature
+    ) external view returns (bytes4 magicValue) {
+        bool isValid = SignatureChecker.isValidSignatureNow(
+            owner(),
+            hash,
+            signature
+        );
+        if (isValid) {
+            return IERC1271.isValidSignature.selector;
+        }
+
+        return "";
     }
 }

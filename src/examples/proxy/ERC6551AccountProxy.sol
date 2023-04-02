@@ -4,25 +4,16 @@ pragma solidity ^0.8.13;
 
 /// @author: manifold.xyz
 
-import "openzeppelin-contracts/utils/introspection/IERC165.sol";
-import "openzeppelin-contracts/interfaces/IERC1271.sol";
 import "openzeppelin-contracts/token/ERC721/IERC721.sol";
 import "openzeppelin-contracts/utils/StorageSlot.sol";
 import "openzeppelin-contracts/proxy/utils/Initializable.sol";
-import "openzeppelin-contracts/utils/cryptography/SignatureChecker.sol";
 
 import "../../lib/ERC6551AccountByteCode.sol";
-
-interface IERC6551AccountProxy {
-    function _supportsInterface(bytes4) external view returns (bool);
-
-    function _owner() external view returns (address);
-}
 
 /**
  * ERC6551Account implementation that is an upgradeable proxy
  */
-contract ERC6551AccountProxy is Initializable, IERC1271, IERC165 {
+contract ERC6551AccountProxy is Initializable {
     uint256 public nonce;
 
     constructor() {
@@ -32,7 +23,7 @@ contract ERC6551AccountProxy is Initializable, IERC1271, IERC165 {
     }
 
     modifier onlyOwner() {
-        (bool success, bytes memory data) = _implementation().delegatecall(
+        (bool success, bytes memory data) = _implementation().staticcall(
             abi.encodeWithSignature("owner()")
         );
         require(success && abi.decode(data, (address)) == msg.sender, "Caller is not owner");
@@ -130,35 +121,6 @@ contract ERC6551AccountProxy is Initializable, IERC1271, IERC165 {
     }
 
     /**
-     * @dev Returns the owner of the token owned wallet
-     */
-    function owner() external view returns (address) {
-        // We do this in order to do a view delegatecall
-        return IERC6551AccountProxy(address(this))._owner();
-    }
-
-    function supportsInterface(bytes4 interfaceId) external view returns (bool) {
-        // We do this in order to do a view delegatecall
-        return IERC6551AccountProxy(address(this))._supportsInterface(interfaceId);
-    }
-
-    function _owner() external returns (address) {
-        (bool success, bytes memory data) = _implementation().delegatecall(
-            abi.encodeWithSignature("owner()")
-        );
-        require(success, "Failed to get owner");
-        return abi.decode(data, (address));
-    }
-
-    function _supportsInterface(bytes4 interfaceId) external returns (bool) {
-        (bool success, bytes memory data) = _implementation().delegatecall(
-            abi.encodeWithSignature("supportsInterface(bytes4)", interfaceId)
-        );
-        require(success, "Failed to get supportsInterface");
-        return abi.decode(data, (bool));
-    }
-
-    /**
      * @dev Fallback function that delegates calls to the address returned by `_implementation()`. Will run if no other
      * function in the contract matches the call data.
      */
@@ -172,21 +134,5 @@ contract ERC6551AccountProxy is Initializable, IERC1271, IERC165 {
      */
     receive() external payable virtual {
         _fallback();
-    }
-
-    function isValidSignature(
-        bytes32 hash,
-        bytes memory signature
-    ) external view returns (bytes4 magicValue) {
-        bool isValid = SignatureChecker.isValidSignatureNow(
-            IERC6551AccountProxy(address(this))._owner(),
-            hash,
-            signature
-        );
-        if (isValid) {
-            return IERC1271.isValidSignature.selector;
-        }
-
-        return "";
     }
 }
