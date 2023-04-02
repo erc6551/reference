@@ -5,9 +5,9 @@ import "openzeppelin-contracts/utils/introspection/IERC165.sol";
 import "openzeppelin-contracts/token/ERC721/IERC721.sol";
 import "openzeppelin-contracts/interfaces/IERC1271.sol";
 import "openzeppelin-contracts/utils/cryptography/SignatureChecker.sol";
-import "sstore2/utils/Bytecode.sol";
 
 import "./interfaces/IERC6551Account.sol";
+import "./lib/ERC6551AccountByteCode.sol";
 
 contract ExampleERC6551Account is IERC165, IERC1271, IERC6551Account {
     uint256 public nonce;
@@ -38,7 +38,7 @@ contract ExampleERC6551Account is IERC165, IERC1271, IERC6551Account {
         view
         returns (uint256 chainId, address tokenContract, uint256 tokenId)
     {
-        return abi.decode(Bytecode.codeAt(address(this), 46, 142), (uint256, address, uint256));
+        return ERC6551AccountByteCode.token();
     }
 
     function owner() public view returns (address) {
