@@ -22,14 +22,6 @@ contract ERC6551AccountProxy is Initializable {
         );
     }
 
-    modifier onlyOwner() {
-        (bool success, bytes memory data) = _implementation().staticcall(
-            abi.encodeWithSignature("owner()")
-        );
-        require(success && abi.decode(data, (address)) == msg.sender, "Caller is not owner");
-        _;
-    }
-
     /**
      * Initializer
      */
@@ -97,7 +89,11 @@ contract ERC6551AccountProxy is Initializable {
     /**
      * @dev Upgrades the implementation.  Only the token owner can call this.
      */
-    function upgrade(address implementation_) public onlyOwner {
+    function upgrade(address implementation_) public {
+        (bool success, bytes memory data) = _implementation().delegatecall(
+            abi.encodeWithSignature("owner()")
+        );
+        require(success && abi.decode(data, (address)) == msg.sender, "Caller is not owner");
         require(implementation_ != address(0), "Invalid implementation address");
         ++nonce;
         StorageSlot.getAddressSlot(_IMPLEMENTATION_SLOT).value = implementation_;
@@ -109,7 +105,6 @@ contract ERC6551AccountProxy is Initializable {
      * This function does not return to its internal call site, it will return directly to the external caller.
      */
     function _fallback() internal virtual {
-        ++nonce;
         _delegate(_implementation());
     }
 

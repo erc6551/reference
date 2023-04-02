@@ -22,6 +22,7 @@ import "../../lib/ERC6551AccountByteCode.sol";
 contract ERC6551AccountProxyImpl is IERC165, IERC1271, IERC721Receiver, IERC1155Receiver {
     // Padding for initializable values
     uint256 private _initializablePadding;
+    uint256 public nonce;
 
     event TransactionExecuted(address indexed target, uint256 indexed value, bytes data);
 
@@ -39,6 +40,7 @@ contract ERC6551AccountProxyImpl is IERC165, IERC1271, IERC721Receiver, IERC1155
     ) public returns (bytes memory _result) {
         require(owner() == msg.sender, "Caller is not owner");
         bool success;
+        ++nonce;
         // solhint-disable-next-line avoid-low-level-calls
         (success, _result) = _target.call{value: _value}(_data);
         require(success, string(_result));
