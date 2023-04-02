@@ -4,6 +4,8 @@ pragma solidity ^0.8.13;
 
 /// @author: manifold.xyz
 
+import "openzeppelin-contracts/utils/introspection/IERC165.sol";
+import "openzeppelin-contracts/interfaces/IERC1271.sol";
 import "openzeppelin-contracts/token/ERC721/IERC721.sol";
 import "openzeppelin-contracts/utils/StorageSlot.sol";
 import "openzeppelin-contracts/proxy/utils/Initializable.sol";
@@ -20,7 +22,7 @@ interface IERC6551AccountProxy {
 /**
  * ERC6551Account implementation that is an upgradeable proxy
  */
-contract ERC6551AccountProxy is Initializable {
+contract ERC6551AccountProxy is Initializable, IERC1271, IERC165 {
     uint256 public nonce;
 
     constructor() {
@@ -170,5 +172,17 @@ contract ERC6551AccountProxy is Initializable {
      */
     receive() external payable virtual {
         _fallback();
+    }
+
+    function isValidSignature(
+        bytes32 hash,
+        bytes memory signature
+    ) external view returns (bytes4 magicValue) {
+        bool isValid = SignatureChecker.isValidSignatureNow(IERC6551AccountProxy(address(this))._owner(), hash, signature);
+        if (isValid) {
+            return IERC1271.isValidSignature.selector;
+        }
+
+        return "";
     }
 }

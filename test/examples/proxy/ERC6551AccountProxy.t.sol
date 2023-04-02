@@ -136,7 +136,7 @@ contract AccountProxyTest is Test {
         vm.prank(otherAddress, otherAddress);
         vm.expectRevert(bytes4(keccak256("InitializationFailed()")));
 
-        address deployedAccount = registry.createAccount(
+        registry.createAccount(
             address(proxy),
             block.chainid,
             address(nft),
