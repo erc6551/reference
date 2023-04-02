@@ -15,6 +15,8 @@ import "../../lib/ERC6551AccountByteCode.sol";
  * ERC6551Account implementation that is an upgradeable proxy
  */
 contract ERC6551AccountProxy is Initializable, Proxy {
+    // Nonce is defined at the proxy level because it needs to be incremented
+    // when the implementation is upgraded.
     uint256 public nonce;
 
     constructor() {
@@ -74,6 +76,8 @@ contract ERC6551AccountProxy is Initializable, Proxy {
 
     /**
      * @dev Returns the owner token chainId, contract address, and token id.
+     *      Defined in proxy because to prevent malicious implementations from
+     *      spoofing a different token.
      */
     function token() external view returns (uint256, address, uint256) {
         return ERC6551AccountByteCode.token();
