@@ -4,22 +4,25 @@ pragma solidity ^0.8.13;
 import "forge-std/Test.sol";
 
 import "../../../src/ERC6551Registry.sol";
-import "../../../src/examples/proxy/ERC6551AccountProxy.sol";
-import "../../../src/examples/proxy/ERC6551AccountProxyImpl.sol";
+import "../../../src/examples/proxy/ERC6551AccountSafeProxy.sol";
+import "../../../src/examples/proxy/ERC6551AccountSafeProxyImpl.sol";
 import "../../mocks/MockERC721.sol";
 import "../../mocks/MockERC1155.sol";
+import "./mocks/MaliciousERC6551AccountProxyImpl.sol";
 
-contract AccountProxyTest is Test {
+contract AccountSafeProxyTest is Test {
     ERC6551Registry public registry;
-    ERC6551AccountProxy public proxy;
-    ERC6551AccountProxyImpl public proxyImpl;
+    ERC6551AccountSafeProxy public proxy;
+    ERC6551AccountSafeProxyImpl public proxyImpl;
+    MaliciousERC6551AccountProxyImpl public maliciousProxyImpl;
     MockERC721 nft = new MockERC721();
     MockERC1155 nft1155 = new MockERC1155();
 
     function setUp() public {
         registry = new ERC6551Registry();
-        proxy = new ERC6551AccountProxy();
-        proxyImpl = new ERC6551AccountProxyImpl();
+        proxy = new ERC6551AccountSafeProxy();
+        proxyImpl = new ERC6551AccountSafeProxyImpl();
+        maliciousProxyImpl = new MaliciousERC6551AccountProxyImpl();
     }
 
     function testDeploy() public {
@@ -51,7 +54,7 @@ contract AccountProxyTest is Test {
 
         assertEq(predictedAccount, deployedAccount);
 
-        address implementation = ERC6551AccountProxy(payable(deployedAccount)).implementation();
+        address implementation = ERC6551AccountSafeProxy(payable(deployedAccount)).implementation();
         assertEq(implementation, address(proxyImpl));
 
         // Can't be deployed twice
@@ -123,6 +126,26 @@ contract AccountProxyTest is Test {
         assertEq(account.balance, 0.5 ether);
         assertEq(vm.addr(2).balance, 0.5 ether);
         assertEq(accountInstance.nonce(), 1);
+    }
+
+    function testDeployNotTokenOwner() public {
+        address owner = vm.addr(1);
+        uint256 tokenId = 100;
+
+        nft.mint(owner, tokenId);
+
+        address otherAddress = vm.addr(2);
+        vm.prank(otherAddress, otherAddress);
+        vm.expectRevert(bytes4(keccak256("InitializationFailed()")));
+
+        registry.createAccount(
+            address(proxy),
+            block.chainid,
+            address(nft),
+            tokenId,
+            0,
+            abi.encodeWithSignature("initialize(address)", address(proxyImpl))
+        );
     }
 
     function testCannotOwnSelf() public {
@@ -228,14 +251,14 @@ contract AccountProxyTest is Test {
             abi.encodeWithSignature("initialize(address)", address(proxyImpl))
         );
 
-        ERC6551AccountProxyImpl proxyImpl2 = new ERC6551AccountProxyImpl();
+        ERC6551AccountSafeProxyImpl proxyImpl2 = new ERC6551AccountSafeProxyImpl();
         vm.prank(vm.addr(2));
         vm.expectRevert("Caller is not owner");
-        ERC6551AccountProxyImpl(payable(account)).upgrade(address(proxyImpl2));
+        ERC6551AccountSafeProxy(payable(account)).upgrade(address(proxyImpl2));
 
         vm.prank(owner);
-        ERC6551AccountProxyImpl(payable(account)).upgrade(address(proxyImpl2));
-        assertEq(ERC6551AccountProxy(payable(account)).implementation(), address(proxyImpl2));
+        ERC6551AccountSafeProxy(payable(account)).upgrade(address(proxyImpl2));
+        assertEq(ERC6551AccountSafeProxy(payable(account)).implementation(), address(proxyImpl2));
     }
 
     function testERC721Receive() public {
@@ -289,5 +312,56 @@ contract AccountProxyTest is Test {
         nft1155.safeTransferFrom(otherOwner, account, tokenId1155, 2, "");
         assertEq(nft1155.balanceOf(account, tokenId1155), 2);
         assertEq(nft1155.balanceOf(otherOwner, tokenId1155), amount1155 - 2);
+    }
+
+    function testMalciousImplementation() public {
+        address owner = vm.addr(1);
+        uint256 tokenId = 100;
+
+        nft.mint(owner, tokenId);
+
+        vm.prank(owner, owner);
+        address account = registry.createAccount(
+            address(proxy),
+            block.chainid,
+            address(nft),
+            tokenId,
+            0,
+            abi.encodeWithSignature("initialize(address)", address(maliciousProxyImpl))
+        );
+
+        IERC6551Account accountInstance = IERC6551Account(payable(account));
+        
+        // We have a malicious implementation that overrides nonce(), token(), owner() and executeCall()
+        // make sure those are ignored in favor of the safe proxy
+        // Check token and owner functions
+        (uint256 chainId_, address tokenAddress_, uint256 tokenId_) = accountInstance.token();
+        assertEq(chainId_, block.chainid);
+        assertEq(tokenAddress_, address(nft));
+        assertEq(tokenId_, tokenId);
+        assertEq(accountInstance.owner(), owner);
+
+        // Check upgrade permissions
+        ERC6551AccountSafeProxyImpl proxyImpl2 = new ERC6551AccountSafeProxyImpl();
+        vm.prank(vm.addr(2));
+        vm.expectRevert("Caller is not owner");
+        ERC6551AccountSafeProxy(payable(account)).upgrade(address(proxyImpl2));
+
+        // Check executeCall permissions
+        vm.deal(account, 1 ether);
+        vm.prank(vm.addr(3));
+        vm.expectRevert("Caller is not owner");
+        accountInstance.executeCall(payable(vm.addr(2)), 0.5 ether, "");
+
+        vm.prank(owner);
+        accountInstance.executeCall(payable(vm.addr(2)), 0.5 ether, "");
+        assertEq(accountInstance.nonce(), 1);
+
+        // Transfer token to new owner and make sure account owner changes
+        address newOwner = vm.addr(2);
+        vm.prank(owner);
+        nft.safeTransferFrom(owner, newOwner, tokenId);
+        assertEq(accountInstance.owner(), newOwner);
+
     }
 }

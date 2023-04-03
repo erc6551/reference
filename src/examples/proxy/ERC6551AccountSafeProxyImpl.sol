@@ -4,11 +4,8 @@ pragma solidity ^0.8.0;
 
 /// @author: manifold.xyz
 
-import "openzeppelin-contracts/interfaces/IERC1271.sol";
-import "openzeppelin-contracts/utils/cryptography/SignatureChecker.sol";
 import "openzeppelin-contracts/utils/introspection/IERC165.sol";
 import "openzeppelin-contracts/utils/introspection/ERC165Checker.sol";
-import "openzeppelin-contracts/utils/StorageSlot.sol";
 import "openzeppelin-contracts/token/ERC721/IERC721.sol";
 import "openzeppelin-contracts/token/ERC721/IERC721Receiver.sol";
 import "openzeppelin-contracts/token/ERC1155/IERC1155Receiver.sol";
@@ -17,21 +14,15 @@ import "../../interfaces/IERC6551Account.sol";
 import "../../lib/ERC6551AccountByteCode.sol";
 
 /**
- * @title ERC6551AccountProxyImpl
+ * @title ERC6551AccountSafeProxyImpl
  * @notice A lightweight smart contract wallet implementation that can be used by ERC6551AccountProxy
  */
-contract ERC6551AccountProxyImpl is IERC165, IERC721Receiver, IERC1155Receiver, IERC6551Account, IERC1271 {
+contract ERC6551AccountSafeProxyImpl is IERC165, IERC721Receiver, IERC1155Receiver {
     // Padding for initializable values
     uint256 private _initializablePadding;
     uint256 private _nonce;
 
-    /**
-     * @dev Storage slot with the address of the current implementation.
-     * This is the keccak-256 hash of "eip1967.proxy.implementation" subtracted by 1, and is
-     * validated in the constructor.
-     */
-    bytes32 internal constant _IMPLEMENTATION_SLOT =
-        0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc;
+    event TransactionExecuted(address indexed target, uint256 indexed value, bytes data);
 
     function supportsInterface(bytes4 interfaceId) external pure returns (bool) {
         return (interfaceId == type(IERC6551Account).interfaceId ||
@@ -78,6 +69,13 @@ contract ERC6551AccountProxyImpl is IERC165, IERC721Receiver, IERC1155Receiver, 
         return this.onERC1155BatchReceived.selector;
     }
 
+    function _owner() private view returns (address) {
+        (uint256 chainId, address contractAddress, uint256 tokenId) = ERC6551AccountByteCode
+            .token();
+        if (chainId != block.chainid) return address(0);
+        return IERC721(contractAddress).ownerOf(tokenId);
+    }
+
     /**
      * @dev Helper method to check if a received token is in the ownership chain of the wallet.
      * @param receivedTokenAddress The address of the token being received.
@@ -87,7 +85,7 @@ contract ERC6551AccountProxyImpl is IERC165, IERC721Receiver, IERC1155Receiver, 
         address receivedTokenAddress,
         uint256 receivedTokenId
     ) internal view {
-        address currentOwner = owner();
+        address currentOwner = _owner();
         require(currentOwner != address(this), "Token in ownership chain");
 
         uint32 currentOwnerSize;
@@ -118,71 +116,5 @@ contract ERC6551AccountProxyImpl is IERC165, IERC721Receiver, IERC1155Receiver, 
                 break;
             }
         }
-    }
-
-    /**
-     * @dev {See IERC6551Account-token}
-     */
-    function token() external view override returns (uint256, address, uint256) {
-        return ERC6551AccountByteCode.token();
-    }
-
-    /**
-     * @dev {See IERC6551Account-owner}
-     */
-    function owner() public view override returns (address) {
-        (uint256 chainId, address contractAddress, uint256 tokenId) = ERC6551AccountByteCode
-            .token();
-        if (chainId != block.chainid) return address(0);
-        return IERC721(contractAddress).ownerOf(tokenId);
-    }
-
-    /**
-     * @dev {See IERC6551Account-nonce}
-     */
-    function nonce() external view override returns (uint256) {
-        return _nonce;
-    }
-
-    /**
-     * @dev {See IERC6551Account-owner}
-     */
-    function executeCall(
-        address _target,
-        uint256 _value,
-        bytes calldata _data
-    ) external payable override returns (bytes memory _result) {
-        require(owner() == msg.sender, "Caller is not owner");
-        ++_nonce;
-        bool success;
-        // solhint-disable-next-line avoid-low-level-calls
-        (success, _result) = _target.call{value: _value}(_data);
-        require(success, string(_result));
-        emit TransactionExecuted(_target, _value, _data);
-        return _result;
-    }
-
-    /**
-     * @dev Upgrades the implementation.  Only the token owner can call this.
-     */
-    function upgrade(address implementation_) public {
-        require(owner() == msg.sender, "Caller is not owner");
-        require(implementation_ != address(0), "Invalid implementation address");
-        ++_nonce;
-        StorageSlot.getAddressSlot(_IMPLEMENTATION_SLOT).value = implementation_;
-    }
-
-    receive() external payable {}
-
-    function isValidSignature(
-        bytes32 hash,
-        bytes memory signature
-    ) external view returns (bytes4 magicValue) {
-        bool isValid = SignatureChecker.isValidSignatureNow(owner(), hash, signature);
-        if (isValid) {
-            return IERC1271.isValidSignature.selector;
-        }
-
-        return "";
     }
 }

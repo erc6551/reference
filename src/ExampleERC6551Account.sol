@@ -31,6 +31,7 @@ contract ExampleERC6551Account is IERC165, IERC1271, IERC6551Account {
                 revert(add(result, 32), mload(result))
             }
         }
+        emit TransactionExecuted(to, value, data);
     }
 
     function token()
