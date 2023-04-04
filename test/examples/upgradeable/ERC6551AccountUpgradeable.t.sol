@@ -49,10 +49,12 @@ contract AccountProxyTest is Test {
 
         assertEq(predictedAccount, deployedAccount);
 
-        assertEq(
-            address(implementation),
-            ERC6551AccountUpgradeable(payable(deployedAccount)).implementation()
+        (bool success, bytes memory data) = deployedAccount.call(
+            abi.encodeWithSignature("implementation()")
         );
+        require(success);
+        address deployedAccountImplementation = abi.decode(data, (address));
+        assertEq(address(implementation), deployedAccountImplementation);
 
         // Can't be deployed twice
         vm.expectRevert("Create2: Failed on deploy");
@@ -242,10 +244,12 @@ contract AccountProxyTest is Test {
 
         vm.prank(owner);
         ERC6551AccountUpgradeable(payable(account)).upgrade(address(implementation2));
-        assertEq(
-            ERC6551AccountUpgradeable(payable(account)).implementation(),
-            address(implementation2)
+        (bool success, bytes memory data) = account.call(
+            abi.encodeWithSignature("implementation()")
         );
+        require(success);
+        address newImplementation = abi.decode(data, (address));
+        assertEq(newImplementation, address(implementation2));
     }
 
     function testERC721Receive() public {

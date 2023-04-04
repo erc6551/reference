@@ -19,11 +19,7 @@ contract MockERC6551Account is IERC165, IERC6551Account {
         _initialized = val;
     }
 
-    function executeCall(
-        address,
-        uint256,
-        bytes calldata
-    ) external payable returns (bytes memory) {
+    function executeCall(address, uint256, bytes calldata) external payable returns (bytes memory) {
         revert("disabled");
     }
 
@@ -42,5 +38,9 @@ contract MockERC6551Account is IERC165, IERC6551Account {
     function supportsInterface(bytes4 interfaceId) public view returns (bool) {
         if (interfaceId == 0xffffffff) return false;
         return _initialized;
+    }
+
+    function codeLength() external view returns (uint256) {
+        return ERC6551AccountByteCode.codeLength();
     }
 }

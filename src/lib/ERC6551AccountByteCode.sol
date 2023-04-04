@@ -56,7 +56,7 @@ library ERC6551AccountByteCode {
     }
 
     bytes public constant creationCode =
-        hex"6044603d608081019182918101608060a0820191016000396000517f360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc556000396000f3fe600036818037808036817f360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc545af43d82803e156039573d90f35b3d90fd";
+        hex"60208038033d393d517f360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc5560f78060343d393df3363d3d3760003560e01c635c60da1b1461004e573d3d363d7f360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc545af43d6000803e610049573d6000fd5b3d6000f35b7f360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc543d5260203df3";
 
     function createCode(
         address implementation_,
@@ -81,18 +81,22 @@ library ERC6551AccountByteCode {
             uint256
         )
     {
-        // codeAt start = creationCode.length-36
-        // codeAt end = creationCode.length+66
+        // codeAt start = creationCode.length-20
+        // codeAt end = creationCode.length+76
         return
             abi.decode(
-                codeAt(address(this), 93, 189),
+                codeAt(address(this), 151, 247),
                 (uint256, address, uint256)
             );
     }
 
     function salt() internal view returns (uint256) {
-        // codeAt start = creationCode.length-68
-        // codeAt end = creationCode.length-36
-        return abi.decode(codeAt(address(this), 61, 93), (uint256));
+        // codeAt start = creationCode.length-52
+        // codeAt end = creationCode.length-20
+        return abi.decode(codeAt(address(this), 119, 151), (uint256));
+    }
+
+    function codeLength() internal view returns (uint256) {
+        return address(this).code.length;
     }
 }

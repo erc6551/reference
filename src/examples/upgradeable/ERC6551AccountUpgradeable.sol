@@ -45,10 +45,6 @@ contract ERC6551AccountUpgradeable is
             interfaceId == type(IERC165).interfaceId);
     }
 
-    function implementation() public view returns (address) {
-        return StorageSlot.getAddressSlot(_IMPLEMENTATION_SLOT).value;
-    }
-
     function onERC721Received(
         address,
         address,

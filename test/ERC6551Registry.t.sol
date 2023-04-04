@@ -43,7 +43,6 @@ contract RegistryTest is Test {
             abi.encodeWithSignature("initialize(bool)", false)
         );
 
-
         deployedAccount = registry.createAccount(
             address(implementation),
             chainId,
@@ -61,6 +60,8 @@ contract RegistryTest is Test {
         assertEq(tokenId_, tokenId);
 
         assertEq(salt, accountInstance.salt());
+
+        console.log(accountInstance.codeLength());
     }
 }
 
@@ -113,16 +114,40 @@ contract AccountTest is Test {
 
         assertTrue(account != address(0));
 
-        assertEq(IERC6551Account(payable(account)).owner(), vm.addr(1));
+        IERC6551Account accountInstance = IERC6551Account(payable(account));
+
+        assertEq(accountInstance.owner(), vm.addr(1));
 
         vm.deal(account, 1 ether);
 
-        IERC6551Account accountInstance = IERC6551Account(payable(account));
         vm.prank(vm.addr(1));
         accountInstance.executeCall(payable(vm.addr(2)), 0.5 ether, "");
 
         assertEq(account.balance, 0.5 ether);
         assertEq(vm.addr(2).balance, 0.5 ether);
         assertEq(accountInstance.nonce(), 1);
+    }
+
+    function testImplementationQuery() public {
+        nft.mint(vm.addr(1), 1);
+
+        address account = registry.createAccount(
+            address(implementation),
+            block.chainid,
+            address(nft),
+            1,
+            0,
+            ""
+        );
+
+        assertTrue(account != address(0));
+
+        IERC6551Account accountInstance = IERC6551Account(payable(account));
+
+        assertEq(accountInstance.owner(), vm.addr(1));
+
+        address accountImplementation = IERC6551AccountProxy(account).implementation();
+
+        assertEq(accountImplementation, address(implementation));
     }
 }
