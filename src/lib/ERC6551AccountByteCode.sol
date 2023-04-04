@@ -55,19 +55,20 @@ library ERC6551AccountByteCode {
         }
     }
 
+    bytes public constant creationCode =
+        hex"6044603d608081019182918101608060a0820191016000396000517f360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc556000396000f3fe600036818037808036817f360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc545af43d82803e156039573d90f35b3d90fd";
+
     function createCode(
         address implementation_,
         uint256 chainId_,
         address tokenContract_,
         uint256 tokenId_,
-        uint256 seed_
+        uint256 salt_
     ) internal pure returns (bytes memory) {
         return
             abi.encodePacked(
-                hex"3d608e80600a3d3981f3363d3d373d3d3d363d73",
-                implementation_,
-                hex"5af43d82803e903d91602b57fd5bf300",
-                abi.encode(chainId_, tokenContract_, tokenId_, seed_)
+                creationCode,
+                abi.encode(salt_, chainId_, tokenContract_, tokenId_, implementation_)
             );
     }
 
@@ -80,10 +81,14 @@ library ERC6551AccountByteCode {
             uint256
         )
     {
-        return abi.decode(codeAt(address(this), 46, 142), (uint256, address, uint256));
+        return
+            abi.decode(
+                codeAt(address(this), 93, 189),
+                (uint256, address, uint256)
+            );
     }
 
-    function seed() internal view returns (uint256) {
-        return abi.decode(codeAt(address(this), 142, 174), (uint256));
+    function salt() internal view returns (uint256) {
+        return abi.decode(codeAt(address(this), 61, 93), (uint256));
     }
 }

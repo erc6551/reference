@@ -17,12 +17,17 @@ import "../../interfaces/IERC6551Account.sol";
 import "../../lib/ERC6551AccountByteCode.sol";
 
 /**
- * @title ERC6551AccountProxyImpl
+ * @title ERC6551AccountUpgradeable
  * @notice A lightweight smart contract wallet implementation that can be used by ERC6551AccountProxy
  */
-contract ERC6551AccountProxyImpl is IERC165, IERC721Receiver, IERC1155Receiver, IERC6551Account, IERC1271 {
+contract ERC6551AccountUpgradeable is
+    IERC165,
+    IERC721Receiver,
+    IERC1155Receiver,
+    IERC6551Account,
+    IERC1271
+{
     // Padding for initializable values
-    uint256 private _initializablePadding;
     uint256 private _nonce;
 
     /**
@@ -38,6 +43,10 @@ contract ERC6551AccountProxyImpl is IERC165, IERC721Receiver, IERC1155Receiver, 
             interfaceId == type(IERC1155Receiver).interfaceId ||
             interfaceId == type(IERC721Receiver).interfaceId ||
             interfaceId == type(IERC165).interfaceId);
+    }
+
+    function implementation() public view returns (address) {
+        return StorageSlot.getAddressSlot(_IMPLEMENTATION_SLOT).value;
     }
 
     function onERC721Received(

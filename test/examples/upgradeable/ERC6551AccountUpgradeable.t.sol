@@ -4,34 +4,32 @@ pragma solidity ^0.8.13;
 import "forge-std/Test.sol";
 
 import "../../../src/ERC6551Registry.sol";
-import "../../../src/examples/proxy/ERC6551AccountProxy.sol";
-import "../../../src/examples/proxy/ERC6551AccountProxyImpl.sol";
+import "../../../src/examples/upgradeable/ERC6551AccountUpgradeable.sol";
 import "../../mocks/MockERC721.sol";
 import "../../mocks/MockERC1155.sol";
 
 contract AccountProxyTest is Test {
     ERC6551Registry public registry;
-    ERC6551AccountProxy public proxy;
-    ERC6551AccountProxyImpl public proxyImpl;
+    ERC6551AccountUpgradeable public implementation;
     MockERC721 nft = new MockERC721();
     MockERC1155 nft1155 = new MockERC1155();
 
     function setUp() public {
         registry = new ERC6551Registry();
-        proxy = new ERC6551AccountProxy();
-        proxyImpl = new ERC6551AccountProxyImpl();
+        implementation = new ERC6551AccountUpgradeable();
     }
 
     function testDeploy() public {
         address owner = vm.addr(1);
         uint256 tokenId = 100;
+        uint256 salt = 200;
 
         address predictedAccount = registry.account(
-            address(proxy),
+            address(implementation),
             block.chainid,
             address(nft),
             tokenId,
-            0
+            salt
         );
 
         nft.mint(owner, tokenId);
@@ -39,44 +37,50 @@ contract AccountProxyTest is Test {
         vm.prank(owner, owner);
 
         address deployedAccount = registry.createAccount(
-            address(proxy),
+            address(implementation),
             block.chainid,
             address(nft),
             tokenId,
-            0,
-            abi.encodeWithSignature("initialize(address)", address(proxyImpl))
+            salt,
+            ""
         );
 
         assertTrue(deployedAccount != address(0));
 
         assertEq(predictedAccount, deployedAccount);
 
-        address implementation = ERC6551AccountProxy(payable(deployedAccount)).implementation();
-        assertEq(implementation, address(proxyImpl));
+        assertEq(
+            address(implementation),
+            ERC6551AccountUpgradeable(payable(deployedAccount)).implementation()
+        );
 
         // Can't be deployed twice
         vm.expectRevert("Create2: Failed on deploy");
-        registry.createAccount(address(proxy), block.chainid, address(nft), tokenId, 0, "");
-
-        // Can't be initialized twice
-        vm.expectRevert("Initializable: contract is already initialized");
-        deployedAccount.call(abi.encodeWithSignature("initialize(address)", address(proxyImpl)));
+        registry.createAccount(
+            address(implementation),
+            block.chainid,
+            address(nft),
+            tokenId,
+            salt,
+            ""
+        );
     }
 
     function testTokenAndOwnership() public {
         address owner = vm.addr(1);
         uint256 tokenId = 100;
+        uint256 salt = 200;
 
         nft.mint(owner, tokenId);
 
         vm.prank(owner, owner);
         address account = registry.createAccount(
-            address(proxy),
+            address(implementation),
             block.chainid,
             address(nft),
             tokenId,
-            0,
-            abi.encodeWithSignature("initialize(address)", address(proxyImpl))
+            salt,
+            ""
         );
 
         IERC6551Account accountInstance = IERC6551Account(payable(account));
@@ -98,17 +102,18 @@ contract AccountProxyTest is Test {
     function testPermissionControl() public {
         address owner = vm.addr(1);
         uint256 tokenId = 100;
+        uint256 salt = 200;
 
         nft.mint(owner, tokenId);
 
         vm.prank(owner, owner);
         address account = registry.createAccount(
-            address(proxy),
+            address(implementation),
             block.chainid,
             address(nft),
             tokenId,
-            0,
-            abi.encodeWithSignature("initialize(address)", address(proxyImpl))
+            salt,
+            ""
         );
 
         vm.deal(account, 1 ether);
@@ -128,17 +133,18 @@ contract AccountProxyTest is Test {
     function testCannotOwnSelf() public {
         address owner = vm.addr(1);
         uint256 tokenId = 100;
+        uint256 salt = 200;
 
         nft.mint(owner, tokenId);
 
         vm.prank(owner, owner);
         address account = registry.createAccount(
-            address(proxy),
+            address(implementation),
             block.chainid,
             address(nft),
             tokenId,
-            0,
-            abi.encodeWithSignature("initialize(address)", address(proxyImpl))
+            salt,
+            ""
         );
 
         vm.prank(owner);
@@ -165,30 +171,30 @@ contract AccountProxyTest is Test {
 
         vm.prank(owner1, owner1);
         address account1 = registry.createAccount(
-            address(proxy),
+            address(implementation),
             block.chainid,
             address(nft1),
             tokenId1,
             0,
-            abi.encodeWithSignature("initialize(address)", address(proxyImpl))
+            ""
         );
         vm.prank(owner2, owner2);
         address account2 = registry.createAccount(
-            address(proxy),
+            address(implementation),
             block.chainid,
             address(nft2),
             tokenId2,
             0,
-            abi.encodeWithSignature("initialize(address)", address(proxyImpl))
+            ""
         );
         vm.prank(owner3, owner3);
         address account3 = registry.createAccount(
-            address(proxy),
+            address(implementation),
             block.chainid,
             address(nft3),
             tokenId3,
             0,
-            abi.encodeWithSignature("initialize(address)", address(proxyImpl))
+            ""
         );
 
         // Move token that holds nft1 token1 to the wallet of nft2 token2 (this is ok)
@@ -215,27 +221,31 @@ contract AccountProxyTest is Test {
     function testUpgrade() public {
         address owner = vm.addr(1);
         uint256 tokenId = 100;
+        uint256 salt = 200;
 
         nft.mint(owner, tokenId);
 
         vm.prank(owner, owner);
         address account = registry.createAccount(
-            address(proxy),
+            address(implementation),
             block.chainid,
             address(nft),
             tokenId,
-            0,
-            abi.encodeWithSignature("initialize(address)", address(proxyImpl))
+            salt,
+            ""
         );
 
-        ERC6551AccountProxyImpl proxyImpl2 = new ERC6551AccountProxyImpl();
+        ERC6551AccountUpgradeable implementation2 = new ERC6551AccountUpgradeable();
         vm.prank(vm.addr(2));
         vm.expectRevert("Caller is not owner");
-        ERC6551AccountProxyImpl(payable(account)).upgrade(address(proxyImpl2));
+        ERC6551AccountUpgradeable(payable(account)).upgrade(address(implementation2));
 
         vm.prank(owner);
-        ERC6551AccountProxyImpl(payable(account)).upgrade(address(proxyImpl2));
-        assertEq(ERC6551AccountProxy(payable(account)).implementation(), address(proxyImpl2));
+        ERC6551AccountUpgradeable(payable(account)).upgrade(address(implementation2));
+        assertEq(
+            ERC6551AccountUpgradeable(payable(account)).implementation(),
+            address(implementation2)
+        );
     }
 
     function testERC721Receive() public {
@@ -246,12 +256,12 @@ contract AccountProxyTest is Test {
 
         vm.prank(owner, owner);
         address account = registry.createAccount(
-            address(proxy),
+            address(implementation),
             block.chainid,
             address(nft),
             tokenId,
             0,
-            abi.encodeWithSignature("initialize(address)", address(proxyImpl))
+            ""
         );
 
         address otherOwner = vm.addr(2);
@@ -271,12 +281,12 @@ contract AccountProxyTest is Test {
 
         vm.prank(owner, owner);
         address account = registry.createAccount(
-            address(proxy),
+            address(implementation),
             block.chainid,
             address(nft),
             tokenId,
             0,
-            abi.encodeWithSignature("initialize(address)", address(proxyImpl))
+            ""
         );
 
         uint256 tokenId1155 = 200;

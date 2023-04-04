@@ -34,11 +34,7 @@ contract ExampleERC6551Account is IERC165, IERC1271, IERC6551Account {
         emit TransactionExecuted(to, value, data);
     }
 
-    function token()
-        external
-        view
-        returns (uint256 chainId, address tokenContract, uint256 tokenId)
-    {
+    function token() external view returns (uint256, address, uint256) {
         return ERC6551AccountByteCode.token();
     }
 
@@ -59,6 +55,7 @@ contract ExampleERC6551Account is IERC165, IERC1271, IERC6551Account {
         bytes memory signature
     ) external view returns (bytes4 magicValue) {
         bool isValid = SignatureChecker.isValidSignatureNow(owner(), hash, signature);
+
         if (isValid) {
             return IERC1271.isValidSignature.selector;
         }
