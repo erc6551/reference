@@ -92,7 +92,7 @@ library ERC6551AccountByteCode {
 
     function salt() internal view returns (uint256) {
         // codeAt start = creationCode.length-68
-        // codeAt end = creationCode.length+36
+        // codeAt end = creationCode.length-36
         return abi.decode(codeAt(address(this), 61, 93), (uint256));
     }
 }
