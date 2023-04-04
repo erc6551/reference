@@ -1,6 +1,10 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.13;
 
+interface IERC6551AccountProxy {
+    function implementation() external view returns (address);
+}
+
 /// @dev the ERC-165 identifier for this interface is `0xeff4d378`
 interface IERC6551Account {
     receive() external payable;
