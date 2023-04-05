@@ -5,7 +5,6 @@ import "openzeppelin-contracts/utils/introspection/ERC165Checker.sol";
 import "openzeppelin-contracts/utils/Create2.sol";
 
 import "./interfaces/IERC6551Registry.sol";
-import "./interfaces/IERC6551Account.sol";
 
 contract ERC6551Registry is IERC6551Registry {
     error InvalidImplementation();
@@ -27,19 +26,19 @@ contract ERC6551Registry is IERC6551Registry {
             abi.encode(salt, chainId, tokenContract, tokenId, implementation)
         );
 
-        address _account = Create2.deploy(0, bytes32(salt), code);
+        address _account = Create2.computeAddress(
+            bytes32(salt),
+            keccak256(code)
+        );
+
+        if (_account.code.length != 0) return _account;
+
+        _account = Create2.deploy(0, bytes32(salt), code);
 
         if (initData.length != 0) {
             (bool success, ) = _account.call(initData);
             if (!success) revert InitializationFailed();
         }
-
-        bool isValidImplementation = ERC165Checker.supportsInterface(
-            _account,
-            type(IERC6551Account).interfaceId
-        );
-
-        if (!isValidImplementation) revert InvalidImplementation();
 
         emit AccountCreated(
             _account,
