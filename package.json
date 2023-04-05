@@ -3,7 +3,7 @@
   "scripts": {
     "test": "forge test",
     "prettier": "prettier --write '{**/*,*}.{js,ts,tsx,md,mdx,yml,sol}'",
-    "fmt": "prettier -c '{**/*,*}.{js,ts,tsx,md,mdx,yml,sol}'",
+    "format": "prettier -c '{**/*,*}.{js,ts,tsx,md,mdx,yml,sol}'",
     "lint": "solhint -w 0 'contracts/**/*.sol'"
   },
   "dependencies": {
