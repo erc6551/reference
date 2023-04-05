@@ -51,14 +51,6 @@ contract ERC6551AccountUpgradeable is
         uint256 receivedTokenId,
         bytes memory
     ) public view returns (bytes4) {
-        (uint256 _chainId, address _contractAddress, uint256 _tokenId) = ERC6551AccountByteCode
-            .token();
-        require(
-            _chainId != block.chainid ||
-                msg.sender != _contractAddress ||
-                receivedTokenId != _tokenId,
-            "Cannot own yourself"
-        );
         _revertIfOwnershipCycle(msg.sender, receivedTokenId);
         return this.onERC721Received.selector;
     }
@@ -92,15 +84,19 @@ contract ERC6551AccountUpgradeable is
         address receivedTokenAddress,
         uint256 receivedTokenId
     ) internal view {
+        (uint256 _chainId, address _contractAddress, uint256 _tokenId) = ERC6551AccountByteCode
+            .token();
+        require(
+            _chainId != block.chainid ||
+                receivedTokenAddress != _contractAddress ||
+                receivedTokenId != _tokenId,
+            "Cannot own yourself"
+        );
+
         address currentOwner = owner();
         require(currentOwner != address(this), "Token in ownership chain");
-
-        uint32 currentOwnerSize;
-        /// @solidity memory-safe-assembly
-        assembly {
-            currentOwnerSize := extcodesize(currentOwner)
-        }
-        while (currentOwnerSize > 0) {
+        uint256 depth = 0;
+        while (currentOwner.code.length > 0) {
             try IERC6551Account(payable(currentOwner)).token() returns (
                 uint256 chainId,
                 address contractAddress,
@@ -115,13 +111,13 @@ contract ERC6551AccountUpgradeable is
                 // Advance up the ownership chain
                 currentOwner = IERC721(contractAddress).ownerOf(tokenId);
                 require(currentOwner != address(this), "Token in ownership chain");
-                /// @solidity memory-safe-assembly
-                assembly {
-                    currentOwnerSize := extcodesize(currentOwner)
-                }
             } catch {
                 break;
             }
+            unchecked {
+                ++depth;
+            }
+            if (depth == 5) revert("Ownership chain too deep");
         }
     }
 

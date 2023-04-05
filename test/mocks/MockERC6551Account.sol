@@ -39,8 +39,4 @@ contract MockERC6551Account is IERC165, IERC6551Account {
         if (interfaceId == 0xffffffff) return false;
         return _initialized;
     }
-
-    function codeLength() external view returns (uint256) {
-        return ERC6551AccountByteCode.codeLength();
-    }
 }

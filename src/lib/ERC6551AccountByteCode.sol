@@ -5,17 +5,6 @@ library ERC6551AccountByteCode {
     error InvalidCodeAtRange(uint256 _size, uint256 _start, uint256 _end);
 
     /**
-    @notice Returns the size of the code on a given address
-    @param _addr Address that may or may not contain code
-    @return size of the code on the given `_addr`
-  */
-    function codeSize(address _addr) private view returns (uint256 size) {
-        assembly {
-            size := extcodesize(_addr)
-        }
-    }
-
-    /**
     @notice Returns the code of a given address
     @dev It will fail if `_end < _start`
     @param _addr Address that may or may not contain code
@@ -29,7 +18,7 @@ library ERC6551AccountByteCode {
         uint256 _start,
         uint256 _end
     ) private view returns (bytes memory oCode) {
-        uint256 csize = codeSize(_addr);
+        uint256 csize = _addr.code.length;
         if (csize == 0) return bytes("");
 
         if (_start > csize) return bytes("");
@@ -94,9 +83,5 @@ library ERC6551AccountByteCode {
         // codeAt start = creationCode.length-52
         // codeAt end = creationCode.length-20
         return abi.decode(codeAt(address(this), 119, 151), (uint256));
-    }
-
-    function codeLength() internal view returns (uint256) {
-        return address(this).code.length;
     }
 }

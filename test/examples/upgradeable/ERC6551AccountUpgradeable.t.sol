@@ -220,6 +220,104 @@ contract AccountProxyTest is Test {
         nft3.safeTransferFrom(owner3, account1, tokenId3);
     }
 
+    function testDepthTooDeep() public {
+        address owner1 = vm.addr(1);
+        address owner2 = vm.addr(2);
+        address owner3 = vm.addr(3);
+        address owner4 = vm.addr(4);
+        address owner5 = vm.addr(5);
+        address owner6 = vm.addr(6);
+        address owner7 = vm.addr(7);
+
+        nft.mint(owner1, 100);
+        nft.mint(owner2, 200);
+        nft.mint(owner3, 300);
+        nft.mint(owner4, 400);
+        nft.mint(owner5, 500);
+        nft.mint(owner6, 600);
+        nft.mint(owner7, 700);
+
+        vm.prank(owner1, owner1);
+        address account1 = registry.createAccount(
+            address(implementation),
+            block.chainid,
+            address(nft),
+            100,
+            0,
+            ""
+        );
+        vm.prank(owner2, owner2);
+        address account2 = registry.createAccount(
+            address(implementation),
+            block.chainid,
+            address(nft),
+            200,
+            0,
+            ""
+        );
+        vm.prank(owner3, owner3);
+        address account3 = registry.createAccount(
+            address(implementation),
+            block.chainid,
+            address(nft),
+            300,
+            0,
+            ""
+        );
+        vm.prank(owner4, owner4);
+        address account4 = registry.createAccount(
+            address(implementation),
+            block.chainid,
+            address(nft),
+            400,
+            0,
+            ""
+        );
+        vm.prank(owner5, owner5);
+        address account5 = registry.createAccount(
+            address(implementation),
+            block.chainid,
+            address(nft),
+            500,
+            0,
+            ""
+        );
+        vm.prank(owner6, owner6);
+        address account6 = registry.createAccount(
+            address(implementation),
+            block.chainid,
+            address(nft),
+            600,
+            0,
+            ""
+        );
+        vm.prank(owner7, owner7);
+        address account7 = registry.createAccount(
+            address(implementation),
+            block.chainid,
+            address(nft),
+            700,
+            0,
+            ""
+        );
+
+        vm.prank(owner1);
+        nft.safeTransferFrom(owner1, account2, 100);
+        vm.prank(owner2);
+        nft.safeTransferFrom(owner2, account3, 200);
+        vm.prank(owner3);
+        nft.safeTransferFrom(owner3, account4, 300);
+        vm.prank(owner4);
+        nft.safeTransferFrom(owner4, account5, 400);
+        vm.prank(owner5);
+        nft.safeTransferFrom(owner5, account6, 500);
+        vm.prank(owner6);
+        nft.safeTransferFrom(owner6, account7, 600);
+        vm.prank(owner7);
+        vm.expectRevert("Ownership chain too deep");
+        nft.safeTransferFrom(owner7, account1, 700);
+    }
+
     function testUpgrade() public {
         address owner = vm.addr(1);
         uint256 tokenId = 100;

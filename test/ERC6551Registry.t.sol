@@ -60,8 +60,6 @@ contract RegistryTest is Test {
         assertEq(tokenId_, tokenId);
 
         assertEq(salt, accountInstance.salt());
-
-        console.log(accountInstance.codeLength());
     }
 }
 

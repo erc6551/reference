@@ -1,11 +1,10 @@
 {
-  "printWidth": 100,
   "proseWrap": "preserve",
+  "printWidth": 100,
   "overrides": [
     {
       "files": "*.sol",
       "options": {
-        "printWidth": 100,
         "tabWidth": 4,
         "useTabs": false,
         "bracketSpacing": false,
