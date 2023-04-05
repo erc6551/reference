@@ -402,4 +402,81 @@ contract AccountProxyTest is Test {
         assertEq(nft1155.balanceOf(account, tokenId1155), 2);
         assertEq(nft1155.balanceOf(otherOwner, tokenId1155), amount1155 - 2);
     }
+
+    function testOwnershipChain() public {
+        address owner1 = vm.addr(1);
+        address owner2 = vm.addr(2);
+        address owner3 = vm.addr(3);
+        address owner4 = vm.addr(4);
+        address newTokenOwner = vm.addr(7);
+
+        nft.mint(owner1, 100);
+        nft.mint(owner2, 200);
+        nft.mint(owner3, 300);
+        nft.mint(owner4, 400);
+
+        vm.prank(owner1, owner1);
+        address account1 = registry.createAccount(
+            address(implementation),
+            block.chainid,
+            address(nft),
+            100,
+            0,
+            ""
+        );
+        vm.prank(owner2, owner2);
+        address account2 = registry.createAccount(
+            address(implementation),
+            block.chainid,
+            address(nft),
+            200,
+            0,
+            ""
+        );
+        vm.prank(owner3, owner3);
+        address account3 = registry.createAccount(
+            address(implementation),
+            block.chainid,
+            address(nft),
+            300,
+            0,
+            ""
+        );
+        vm.prank(owner4, owner4);
+        address account4 = registry.createAccount(
+            address(implementation),
+            block.chainid,
+            address(nft),
+            400,
+            0,
+            ""
+        );
+
+        vm.prank(owner1);
+        nft.safeTransferFrom(owner1, account2, 100);
+        vm.prank(owner2);
+        nft.safeTransferFrom(owner2, account3, 200);
+        vm.prank(owner3);
+        nft.safeTransferFrom(owner3, account4, 300);
+
+        // Make sure that we can transfer out token 200
+        vm.prank(owner4);
+        IERC6551Account(payable(account4)).executeCall(
+            address(account3),
+            0,
+            abi.encodeWithSignature(
+                "executeCall(address,uint256,bytes)",
+                address(nft),
+                0,
+                abi.encodeWithSignature(
+                    "safeTransferFrom(address,address,uint256)",
+                    account3,
+                    newTokenOwner,
+                    200
+                )
+            )
+        );
+
+        assertEq(nft.ownerOf(200), newTokenOwner);
+    }
 }
