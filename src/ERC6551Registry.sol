@@ -42,13 +42,6 @@ contract ERC6551Registry is IERC6551Registry {
             if (!success) revert InitializationFailed();
         }
 
-        bool isValidImplementation = ERC165Checker.supportsInterface(
-            _account,
-            type(IERC6551Account).interfaceId
-        );
-
-        if (!isValidImplementation) revert InvalidImplementation();
-
         emit AccountCreated(_account, implementation, chainId, tokenContract, tokenId, salt);
 
         return _account;

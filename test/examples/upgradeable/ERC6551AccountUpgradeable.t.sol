@@ -56,8 +56,7 @@ contract AccountProxyTest is Test {
         address deployedAccountImplementation = abi.decode(data, (address));
         assertEq(address(implementation), deployedAccountImplementation);
 
-        // Can't be deployed twice
-        vm.expectRevert("Create2: Failed on deploy");
+        // Create account is idempotent
         registry.createAccount(
             address(implementation),
             block.chainid,
@@ -416,7 +415,7 @@ contract AccountProxyTest is Test {
         nft.mint(owner4, 400);
 
         vm.prank(owner1, owner1);
-        address account1 = registry.createAccount(
+        registry.createAccount(
             address(implementation),
             block.chainid,
             address(nft),

@@ -23,15 +23,6 @@ contract RegistryTest is Test {
         uint256 tokenId = 300;
         uint256 salt = 400;
         address deployedAccount;
-        vm.expectRevert(abi.encodeWithSelector(bytes4(keccak256("InvalidImplementation()"))));
-        deployedAccount = registry.createAccount(
-            address(implementation),
-            chainId,
-            tokenAddress,
-            tokenId,
-            salt,
-            ""
-        );
 
         vm.expectRevert(abi.encodeWithSelector(bytes4(keccak256("InitializationFailed()"))));
         deployedAccount = registry.createAccount(
