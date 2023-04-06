@@ -1,4 +1,4 @@
-// EIP1967 PROXY CONTRACT
+// ERC6551AccountProxy
 // modified from https://github.com/jtriley-eth/minimum-viable-proxy/blob/main/huff/UUPSProxy.huff
 
 // -------------------------------------------------------------------------------------------------
@@ -14,6 +14,7 @@
 
 #define constant WORD_SIZE = 0x20
 
+#define constant CONTRACT_SIZE = 0xf7
 
 #define macro CONSTRUCTOR() = takes (0) returns (0) {
     // STORE IMPLEMENTATION
@@ -27,7 +28,15 @@
     mload           // [impl]
     [PROXY_SLOT]    // [proxy_slot]
     sstore          // []
-    // TODO: return accurate bytecode length with constant storage space allocated
+
+    // STORE BYTECODE + FOOTER
+    [CONTRACT_SIZE]             // [size]
+    dup1                        // [size, size]
+    __codesize(CONSTRUCTOR)     // [constructor_size, size, size]
+    returndatasize              // [zero, constructor_size, size, size]
+    codecopy                    // [size]
+    returndatasize              // [zero, size]
+    return                      // []
 }
 
 #define macro MAIN() = takes (0) returns (0) {
