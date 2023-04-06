@@ -9,7 +9,6 @@ import "./interfaces/IERC6551Account.sol";
 import "./lib/ERC6551AccountByteCode.sol";
 
 contract ERC6551Registry is IERC6551Registry {
-    error InvalidImplementation();
     error InitializationFailed();
 
     function createAccount(
