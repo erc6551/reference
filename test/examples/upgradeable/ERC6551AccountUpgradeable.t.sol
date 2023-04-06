@@ -415,14 +415,7 @@ contract AccountProxyTest is Test {
         nft.mint(owner4, 400);
 
         vm.prank(owner1, owner1);
-        registry.createAccount(
-            address(implementation),
-            block.chainid,
-            address(nft),
-            100,
-            0,
-            ""
-        );
+        registry.createAccount(address(implementation), block.chainid, address(nft), 100, 0, "");
         vm.prank(owner2, owner2);
         address account2 = registry.createAccount(
             address(implementation),
