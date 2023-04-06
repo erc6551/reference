@@ -5,10 +5,7 @@ const path = require("path");
 async function main() {
   const registryData = JSON.parse(
     fs.readFileSync(
-      path.resolve(
-        __dirname,
-        "../out/ERC6551Registry.sol/ERC6551Registry.json"
-      ),
+      path.resolve(__dirname, "../out/ERC6551Registry.sol/ERC6551Registry.json"),
       "utf-8"
     )
   );
@@ -21,13 +18,10 @@ async function main() {
     data: registryData.bytecode.object,
   };
 
-  const nickMethodTx = nickMethod.generateNickMethodConfigForContractDeployment(
-    tx,
-    {
-      r: "0x7340000000000000000000000000000000000000000000000000000000000734",
-      s: "0x7347347347347347347347347347347347347347347347347347347347347340",
-    }
-  );
+  const nickMethodTx = nickMethod.generateNickMethodConfigForContractDeployment(tx, {
+    r: "0x7340000000000000000000000000000000000000000000000000000000000734",
+    s: "0x7347347347347347347347347347347347347347347347347347347347347340",
+  });
 
   console.log(nickMethodTx);
 }

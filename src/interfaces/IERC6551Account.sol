@@ -7,6 +7,8 @@ interface IERC6551AccountProxy {
 
 /// @dev the ERC-165 identifier for this interface is `0xeff4d378`
 interface IERC6551Account {
+    event TransactionExecuted(address indexed target, uint256 indexed value, bytes data);
+
     receive() external payable;
 
     function executeCall(
@@ -18,11 +20,7 @@ interface IERC6551Account {
     function token()
         external
         view
-        returns (
-            uint256 chainId,
-            address tokenContract,
-            uint256 tokenId
-        );
+        returns (uint256 chainId, address tokenContract, uint256 tokenId);
 
     function owner() external view returns (address);
 

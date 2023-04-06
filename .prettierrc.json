@@ -1,0 +1,14 @@
+{
+  "proseWrap": "preserve",
+  "printWidth": 100,
+  "overrides": [
+    {
+      "files": "*.sol",
+      "options": {
+        "tabWidth": 4,
+        "useTabs": false,
+        "bracketSpacing": false
+      }
+    }
+  ]
+}

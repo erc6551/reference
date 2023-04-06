@@ -5,13 +5,11 @@ import "openzeppelin-contracts/utils/introspection/ERC165Checker.sol";
 import "openzeppelin-contracts/utils/Create2.sol";
 
 import "./interfaces/IERC6551Registry.sol";
+import "./interfaces/IERC6551Account.sol";
+import "./lib/ERC6551AccountByteCode.sol";
 
 contract ERC6551Registry is IERC6551Registry {
-    error InvalidImplementation();
     error InitializationFailed();
-
-    bytes constant creationCode =
-        hex"60208038033d393d517f360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc5560f78060343d393df3363d3d3760003560e01c635c60da1b1461004e573d3d363d7f360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc545af43d6000803e610049573d6000fd5b3d6000f35b7f360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc543d5260203df3";
 
     function createAccount(
         address implementation,
@@ -21,15 +19,15 @@ contract ERC6551Registry is IERC6551Registry {
         uint256 salt,
         bytes calldata initData
     ) external returns (address) {
-        bytes memory code = abi.encodePacked(
-            creationCode,
-            abi.encode(salt, chainId, tokenContract, tokenId, implementation)
+        bytes memory code = ERC6551AccountByteCode.createCode(
+            implementation,
+            chainId,
+            tokenContract,
+            tokenId,
+            salt
         );
 
-        address _account = Create2.computeAddress(
-            bytes32(salt),
-            keccak256(code)
-        );
+        address _account = Create2.computeAddress(bytes32(salt), keccak256(code));
 
         if (_account.code.length != 0) return _account;
 
@@ -40,14 +38,7 @@ contract ERC6551Registry is IERC6551Registry {
             if (!success) revert InitializationFailed();
         }
 
-        emit AccountCreated(
-            _account,
-            implementation,
-            chainId,
-            tokenContract,
-            tokenId,
-            salt
-        );
+        emit AccountCreated(_account, implementation, chainId, tokenContract, tokenId, salt);
 
         return _account;
     }
@@ -60,16 +51,7 @@ contract ERC6551Registry is IERC6551Registry {
         uint256 salt
     ) external view returns (address) {
         bytes32 bytecodeHash = keccak256(
-            abi.encodePacked(
-                creationCode,
-                abi.encode(
-                    salt,
-                    chainId,
-                    tokenContract,
-                    tokenId,
-                    implementation
-                )
-            )
+            ERC6551AccountByteCode.createCode(implementation, chainId, tokenContract, tokenId, salt)
         );
 
         return Create2.computeAddress(bytes32(salt), bytecodeHash);
