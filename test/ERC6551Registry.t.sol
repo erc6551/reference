@@ -4,65 +4,64 @@ pragma solidity ^0.8.13;
 import "forge-std/Test.sol";
 
 import "../src/ERC6551Registry.sol";
-import "../src/ExampleERC6551Account.sol";
 import "./mocks/MockERC721.sol";
+import "./mocks/MockERC6551Account.sol";
 
-contract AccountTest is Test {
+contract RegistryTest is Test {
     ERC6551Registry public registry;
-    ExampleERC6551Account public implementation;
-    MockERC721 nft = new MockERC721();
+    MockERC6551Account public implementation;
 
     function setUp() public {
         registry = new ERC6551Registry();
-        implementation = new ExampleERC6551Account();
+        implementation = new MockERC6551Account();
     }
 
     function testDeploy() public {
-        address deployedAccount = registry.createAccount(
+        uint256 chainId = 100;
+        address tokenAddress = address(200);
+        uint256 tokenId = 300;
+        uint256 salt = 400;
+        address deployedAccount;
+
+        vm.expectRevert(
+            abi.encodeWithSelector(bytes4(keccak256("InitializationFailed()")))
+        );
+        deployedAccount = registry.createAccount(
             address(implementation),
-            block.chainid,
-            address(0),
-            0
+            chainId,
+            tokenAddress,
+            tokenId,
+            salt,
+            abi.encodeWithSignature("initialize(bool)", false)
         );
 
-        assertTrue(deployedAccount != address(0));
-
-        address predictedAccount = registry.account(
+        deployedAccount = registry.createAccount(
             address(implementation),
-            block.chainid,
-            address(0),
-            0
+            chainId,
+            tokenAddress,
+            tokenId,
+            salt,
+            abi.encodeWithSignature("initialize(bool)", true)
         );
 
-        assertEq(predictedAccount, deployedAccount);
-
-        console.logBytes4(type(IERC6551Account).interfaceId);
-    }
-
-    function testCall() public {
-        nft.mint(vm.addr(1), 1);
-
-        address account = registry.createAccount(
-            address(implementation),
-            block.chainid,
-            address(nft),
-            1
+        MockERC6551Account accountInstance = MockERC6551Account(
+            payable(deployedAccount)
         );
 
-        assertTrue(account != address(0));
+        (
+            uint256 chainId_,
+            address tokenAddress_,
+            uint256 tokenId_
+        ) = accountInstance.token();
+        assertEq(chainId_, chainId);
+        assertEq(tokenAddress_, tokenAddress);
+        assertEq(tokenId_, tokenId);
 
-        assertEq(IERC6551Account(payable(account)).owner(), vm.addr(1));
+        assertEq(salt, accountInstance.salt());
 
-        vm.deal(account, 1 ether);
+        address accountImplementation = IERC6551AccountProxy(deployedAccount)
+            .implementation();
 
-        vm.prank(vm.addr(1));
-        IERC6551Account(payable(account)).executeCall(
-            payable(vm.addr(2)),
-            0.5 ether,
-            ""
-        );
-
-        assertEq(account.balance, 0.5 ether);
-        assertEq(vm.addr(2).balance, 0.5 ether);
+        assertEq(accountImplementation, address(implementation));
     }
 }

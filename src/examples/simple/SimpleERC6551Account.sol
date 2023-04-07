@@ -5,11 +5,13 @@ import "openzeppelin-contracts/utils/introspection/IERC165.sol";
 import "openzeppelin-contracts/token/ERC721/IERC721.sol";
 import "openzeppelin-contracts/interfaces/IERC1271.sol";
 import "openzeppelin-contracts/utils/cryptography/SignatureChecker.sol";
-import "sstore2/utils/Bytecode.sol";
 
-import "./interfaces/IERC6551Account.sol";
+import "../../interfaces/IERC6551Account.sol";
+import "../../lib/ERC6551AccountByteCode.sol";
 
-contract ExampleERC6551Account is IERC165, IERC1271, IERC6551Account {
+contract SimpleERC6551Account is IERC165, IERC1271, IERC6551Account {
+    uint256 public nonce;
+
     receive() external payable {}
 
     function executeCall(
@@ -22,27 +24,27 @@ contract ExampleERC6551Account is IERC165, IERC1271, IERC6551Account {
         bool success;
         (success, result) = to.call{value: value}(data);
 
+        ++nonce;
+
         if (!success) {
             assembly {
                 revert(add(result, 32), mload(result))
             }
         }
+
+        emit TransactionExecuted(to, value, data);
     }
 
     function token()
         external
         view
         returns (
-            uint256 chainId,
-            address tokenContract,
-            uint256 tokenId
+            uint256,
+            address,
+            uint256
         )
     {
-        return
-            abi.decode(
-                Bytecode.codeAt(address(this), 46, 142),
-                (uint256, address, uint256)
-            );
+        return ERC6551AccountByteCode.token();
     }
 
     function owner() public view returns (address) {

@@ -1,7 +1,17 @@
 {
+  "name": "@erc6551/reference",
+  "version": "0.1.0",
   "main": "index.js",
-  "dependencies": {
-    "ethers": "^6.0.8",
-    "nick-method": "^1.1.0"
+  "scripts": {
+    "test": "forge test",
+    "prettier": "prettier --write '{**/*,*}.{js,ts,tsx,md,mdx,yml,sol}'",
+    "format": "prettier -c '{**/*,*}.{js,ts,tsx,md,mdx,yml,sol}'",
+    "lint": "solhint -w 0 'contracts/**/*.sol'"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "prettier": "^2.6.2",
+    "prettier-plugin-solidity": "^1.0.0-beta.19",
+    "solhint": "^3.3.7"
   }
 }
