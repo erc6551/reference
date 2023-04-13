@@ -40,12 +40,6 @@
 }
 
 #define macro MAIN() = takes (0) returns (0) {
-    // COPY CALLDATA TO MEMORY
-    calldatasize                // [calldatasize]
-    returndatasize              // [zero, calldatasize]
-    returndatasize              // [zero, zero, calldatasize]
-    calldatacopy                // []
-
     // LOAD CALLDATA SIGNATURE
     0x00 calldataload           // [calldata @ 0x00]
     0xE0 shr                    // [func_sig (calldata @ 0x00 >> 0xE0)]
@@ -53,6 +47,12 @@
     eq                          // [func_sig(implementation) == func_sig]
     implementation
     jumpi
+
+    // COPY CALLDATA TO MEMORY
+    calldatasize                // [calldatasize]
+    returndatasize              // [zero, calldatasize]
+    returndatasize              // [zero, zero, calldatasize]
+    calldatacopy                // []
 
     // DELEGATECALL
     returndatasize              // [retsize]
