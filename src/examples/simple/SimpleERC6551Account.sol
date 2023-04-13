@@ -7,7 +7,7 @@ import "openzeppelin-contracts/interfaces/IERC1271.sol";
 import "openzeppelin-contracts/utils/cryptography/SignatureChecker.sol";
 
 import "../../interfaces/IERC6551Account.sol";
-import "../../lib/ERC6551AccountByteCode.sol";
+import "../../lib/ERC6551AccountBytecode.sol";
 
 contract SimpleERC6551Account is IERC165, IERC1271, IERC6551Account {
     uint256 public nonce;
@@ -44,12 +44,11 @@ contract SimpleERC6551Account is IERC165, IERC1271, IERC6551Account {
             uint256
         )
     {
-        return ERC6551AccountByteCode.token();
+        return ERC6551AccountBytecode.token();
     }
 
     function owner() public view returns (address) {
-        (uint256 chainId, address tokenContract, uint256 tokenId) = this
-            .token();
+        (uint256 chainId, address tokenContract, uint256 tokenId) = this.token();
         if (chainId != block.chainid) return address(0);
 
         return IERC721(tokenContract).ownerOf(tokenId);
@@ -65,11 +64,7 @@ contract SimpleERC6551Account is IERC165, IERC1271, IERC6551Account {
         view
         returns (bytes4 magicValue)
     {
-        bool isValid = SignatureChecker.isValidSignatureNow(
-            owner(),
-            hash,
-            signature
-        );
+        bool isValid = SignatureChecker.isValidSignatureNow(owner(), hash, signature);
 
         if (isValid) {
             return IERC1271.isValidSignature.selector;

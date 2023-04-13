@@ -14,7 +14,7 @@ import "openzeppelin-contracts/token/ERC721/IERC721Receiver.sol";
 import "openzeppelin-contracts/token/ERC1155/IERC1155Receiver.sol";
 
 import "../../interfaces/IERC6551Account.sol";
-import "../../lib/ERC6551AccountByteCode.sol";
+import "../../lib/ERC6551AccountBytecode.sol";
 
 /**
  * @title ERC6551AccountUpgradeable
@@ -80,11 +80,11 @@ contract ERC6551AccountUpgradeable is
      * @param receivedTokenAddress The address of the token being received.
      * @param receivedTokenId The ID of the token being received.
      */
-    function _revertIfOwnershipCycle(
-        address receivedTokenAddress,
-        uint256 receivedTokenId
-    ) internal view {
-        (uint256 _chainId, address _contractAddress, uint256 _tokenId) = ERC6551AccountByteCode
+    function _revertIfOwnershipCycle(address receivedTokenAddress, uint256 receivedTokenId)
+        internal
+        view
+    {
+        (uint256 _chainId, address _contractAddress, uint256 _tokenId) = ERC6551AccountBytecode
             .token();
         require(
             _chainId != block.chainid ||
@@ -124,15 +124,24 @@ contract ERC6551AccountUpgradeable is
     /**
      * @dev {See IERC6551Account-token}
      */
-    function token() external view override returns (uint256, address, uint256) {
-        return ERC6551AccountByteCode.token();
+    function token()
+        external
+        view
+        override
+        returns (
+            uint256,
+            address,
+            uint256
+        )
+    {
+        return ERC6551AccountBytecode.token();
     }
 
     /**
      * @dev {See IERC6551Account-owner}
      */
     function owner() public view override returns (address) {
-        (uint256 chainId, address contractAddress, uint256 tokenId) = ERC6551AccountByteCode
+        (uint256 chainId, address contractAddress, uint256 tokenId) = ERC6551AccountBytecode
             .token();
         if (chainId != block.chainid) return address(0);
         return IERC721(contractAddress).ownerOf(tokenId);
@@ -175,10 +184,11 @@ contract ERC6551AccountUpgradeable is
 
     receive() external payable {}
 
-    function isValidSignature(
-        bytes32 hash,
-        bytes memory signature
-    ) external view returns (bytes4 magicValue) {
+    function isValidSignature(bytes32 hash, bytes memory signature)
+        external
+        view
+        returns (bytes4 magicValue)
+    {
         bool isValid = SignatureChecker.isValidSignatureNow(owner(), hash, signature);
         if (isValid) {
             return IERC1271.isValidSignature.selector;
