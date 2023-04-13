@@ -5,7 +5,7 @@ import "openzeppelin-contracts/utils/Create2.sol";
 
 import "./interfaces/IERC6551Registry.sol";
 import "./interfaces/IERC6551Account.sol";
-import "./lib/ERC6551AccountByteCode.sol";
+import "./lib/ERC6551AccountBytecode.sol";
 
 contract ERC6551Registry is IERC6551Registry {
     error InitializationFailed();
@@ -18,7 +18,7 @@ contract ERC6551Registry is IERC6551Registry {
         uint256 salt,
         bytes calldata initData
     ) external returns (address) {
-        bytes memory code = ERC6551AccountByteCode.createCode(
+        bytes memory code = ERC6551AccountBytecode.createCode(
             implementation,
             chainId,
             tokenContract,
@@ -50,7 +50,7 @@ contract ERC6551Registry is IERC6551Registry {
         uint256 salt
     ) external view returns (address) {
         bytes32 bytecodeHash = keccak256(
-            ERC6551AccountByteCode.createCode(implementation, chainId, tokenContract, tokenId, salt)
+            ERC6551AccountBytecode.createCode(implementation, chainId, tokenContract, tokenId, salt)
         );
 
         return Create2.computeAddress(bytes32(salt), bytecodeHash);

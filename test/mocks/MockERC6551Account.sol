@@ -4,7 +4,7 @@ pragma solidity ^0.8.13;
 import "openzeppelin-contracts/utils/introspection/IERC165.sol";
 
 import "../../src/interfaces/IERC6551Account.sol";
-import "../../src/lib/ERC6551AccountByteCode.sol";
+import "../../src/lib/ERC6551AccountBytecode.sol";
 
 contract MockERC6551Account is IERC165, IERC6551Account {
     uint256 public nonce;
@@ -19,16 +19,28 @@ contract MockERC6551Account is IERC165, IERC6551Account {
         _initialized = val;
     }
 
-    function executeCall(address, uint256, bytes calldata) external payable returns (bytes memory) {
+    function executeCall(
+        address,
+        uint256,
+        bytes calldata
+    ) external payable returns (bytes memory) {
         revert("disabled");
     }
 
-    function token() external view returns (uint256, address, uint256) {
-        return ERC6551AccountByteCode.token();
+    function token()
+        external
+        view
+        returns (
+            uint256,
+            address,
+            uint256
+        )
+    {
+        return ERC6551AccountBytecode.token();
     }
 
     function salt() external view returns (uint256) {
-        return ERC6551AccountByteCode.salt();
+        return ERC6551AccountBytecode.salt();
     }
 
     function owner() public pure returns (address) {
