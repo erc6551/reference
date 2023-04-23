@@ -21,18 +21,18 @@ contract SimpleERC6551Account is IERC165, IERC1271, IERC6551Account {
     ) external payable returns (bytes memory result) {
         require(msg.sender == owner(), "Not token owner");
 
+        ++nonce;
+
+        emit TransactionExecuted(to, value, data);
+
         bool success;
         (success, result) = to.call{value: value}(data);
-
-        ++nonce;
 
         if (!success) {
             assembly {
                 revert(add(result, 32), mload(result))
             }
         }
-
-        emit TransactionExecuted(to, value, data);
     }
 
     function token()
