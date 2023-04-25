@@ -49,15 +49,8 @@ contract AccountProxyTest is Test {
 
         assertEq(predictedAccount, deployedAccount);
 
-        (bool success, bytes memory data) = deployedAccount.call(
-            abi.encodeWithSignature("implementation()")
-        );
-        require(success);
-        address deployedAccountImplementation = abi.decode(data, (address));
-        assertEq(address(implementation), deployedAccountImplementation);
-
         // Create account is idempotent
-        registry.createAccount(
+        deployedAccount = registry.createAccount(
             address(implementation),
             block.chainid,
             address(nft),
@@ -65,6 +58,7 @@ contract AccountProxyTest is Test {
             salt,
             ""
         );
+        assertEq(predictedAccount, deployedAccount);
     }
 
     function testTokenAndOwnership() public {
@@ -341,12 +335,13 @@ contract AccountProxyTest is Test {
 
         vm.prank(owner);
         ERC6551AccountUpgradeable(payable(account)).upgrade(address(implementation2));
-        (bool success, bytes memory data) = account.call(
-            abi.encodeWithSignature("implementation()")
+
+        bytes32 rawImplementation = vm.load(
+            account,
+            0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc
         );
-        require(success);
-        address newImplementation = abi.decode(data, (address));
-        assertEq(newImplementation, address(implementation2));
+
+        assertEq(address(uint160(uint256(rawImplementation))), address(implementation2));
     }
 
     function testERC721Receive() public {
