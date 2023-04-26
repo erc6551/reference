@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.13;
 
-import "forge-std/console.sol";
-
 library ERC6551AccountBytecode {
     function createCode(
         address implementation_,
