@@ -2,9 +2,6 @@
 pragma solidity ^0.8.13;
 
 library ERC6551AccountBytecode {
-    bytes public constant creationCode =
-        hex"60208038033d393d517f360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc5560f78060343d393df360003560e01c635c60da1b1461004e57363d3d373d3d363d7f360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc545af43d6000803e610049573d6000fd5b3d6000f35b7f360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc543d5260203df3";
-
     function createCode(
         address implementation_,
         uint256 chainId_,
@@ -14,8 +11,10 @@ library ERC6551AccountBytecode {
     ) internal pure returns (bytes memory) {
         return
             abi.encodePacked(
-                creationCode,
-                abi.encode(salt_, chainId_, tokenContract_, tokenId_, implementation_)
+                hex"3d60ad80600a3d3981f3363d3d373d3d3d363d73",
+                implementation_,
+                hex"5af43d82803e903d91602b57fd5bf3",
+                abi.encode(salt_, chainId_, tokenContract_, tokenId_)
             );
     }
 
@@ -32,7 +31,7 @@ library ERC6551AccountBytecode {
 
         assembly {
             // copy 0x60 bytes from end of footer
-            extcodecopy(address(), add(footer, 0x20), 0x97, 0xf7)
+            extcodecopy(address(), add(footer, 0x20), 0x4d, 0xad)
         }
 
         return abi.decode(footer, (uint256, address, uint256));
@@ -43,7 +42,7 @@ library ERC6551AccountBytecode {
 
         assembly {
             // copy 0x20 bytes from beginning of footer
-            extcodecopy(address(), add(footer, 0x20), 0x77, 0x97)
+            extcodecopy(address(), add(footer, 0x20), 0x2d, 0x4d)
         }
 
         return abi.decode(footer, (uint256));

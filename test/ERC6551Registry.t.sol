@@ -23,9 +23,7 @@ contract RegistryTest is Test {
         uint256 salt = 400;
         address deployedAccount;
 
-        vm.expectRevert(
-            abi.encodeWithSelector(bytes4(keccak256("InitializationFailed()")))
-        );
+        vm.expectRevert(abi.encodeWithSelector(bytes4(keccak256("InitializationFailed()"))));
         deployedAccount = registry.createAccount(
             address(implementation),
             chainId,
@@ -44,24 +42,13 @@ contract RegistryTest is Test {
             abi.encodeWithSignature("initialize(bool)", true)
         );
 
-        MockERC6551Account accountInstance = MockERC6551Account(
-            payable(deployedAccount)
-        );
+        MockERC6551Account accountInstance = MockERC6551Account(payable(deployedAccount));
 
-        (
-            uint256 chainId_,
-            address tokenAddress_,
-            uint256 tokenId_
-        ) = accountInstance.token();
+        (uint256 chainId_, address tokenAddress_, uint256 tokenId_) = accountInstance.token();
         assertEq(chainId_, chainId);
         assertEq(tokenAddress_, tokenAddress);
         assertEq(tokenId_, tokenId);
 
         assertEq(salt, accountInstance.salt());
-
-        address accountImplementation = IERC6551AccountProxy(deployedAccount)
-            .implementation();
-
-        assertEq(accountImplementation, address(implementation));
     }
 }
