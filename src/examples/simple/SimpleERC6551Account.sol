@@ -7,7 +7,7 @@ import "openzeppelin-contracts/interfaces/IERC1271.sol";
 import "openzeppelin-contracts/utils/cryptography/SignatureChecker.sol";
 
 import "../../interfaces/IERC6551Account.sol";
-import "../../lib/ERC6551AccountBytecode.sol";
+import "../../lib/ERC6551AccountLib.sol";
 
 contract SimpleERC6551Account is IERC165, IERC1271, IERC6551Account {
     uint256 public nonce;
@@ -44,7 +44,7 @@ contract SimpleERC6551Account is IERC165, IERC1271, IERC6551Account {
             uint256
         )
     {
-        return ERC6551AccountBytecode.token();
+        return ERC6551AccountLib.token();
     }
 
     function owner() public view returns (address) {
