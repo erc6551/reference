@@ -5,18 +5,22 @@ import "forge-std/Test.sol";
 
 import "../../../src/ERC6551Registry.sol";
 import "../../../src/examples/upgradeable/ERC6551AccountUpgradeable.sol";
+import "../../../src/examples/upgradeable/ERC6551AccountProxy.sol";
 import "../../mocks/MockERC721.sol";
 import "../../mocks/MockERC1155.sol";
+import "../../mocks/MockERC6551Account.sol";
 
 contract AccountProxyTest is Test {
     ERC6551Registry public registry;
     ERC6551AccountUpgradeable public implementation;
+    ERC6551AccountProxy public proxy;
     MockERC721 nft = new MockERC721();
     MockERC1155 nft1155 = new MockERC1155();
 
     function setUp() public {
         registry = new ERC6551Registry();
         implementation = new ERC6551AccountUpgradeable();
+        proxy = new ERC6551AccountProxy(address(implementation));
     }
 
     function testDeploy() public {
@@ -25,7 +29,7 @@ contract AccountProxyTest is Test {
         uint256 salt = 200;
 
         address predictedAccount = registry.account(
-            address(implementation),
+            address(proxy),
             block.chainid,
             address(nft),
             tokenId,
@@ -37,7 +41,7 @@ contract AccountProxyTest is Test {
         vm.prank(owner, owner);
 
         address deployedAccount = registry.createAccount(
-            address(implementation),
+            address(proxy),
             block.chainid,
             address(nft),
             tokenId,
@@ -49,22 +53,16 @@ contract AccountProxyTest is Test {
 
         assertEq(predictedAccount, deployedAccount);
 
-        (bool success, bytes memory data) = deployedAccount.call(
-            abi.encodeWithSignature("implementation()")
-        );
-        require(success);
-        address deployedAccountImplementation = abi.decode(data, (address));
-        assertEq(address(implementation), deployedAccountImplementation);
-
         // Create account is idempotent
-        registry.createAccount(
-            address(implementation),
+        deployedAccount = registry.createAccount(
+            address(proxy),
             block.chainid,
             address(nft),
             tokenId,
             salt,
             ""
         );
+        assertEq(predictedAccount, deployedAccount);
     }
 
     function testTokenAndOwnership() public {
@@ -76,7 +74,7 @@ contract AccountProxyTest is Test {
 
         vm.prank(owner, owner);
         address account = registry.createAccount(
-            address(implementation),
+            address(proxy),
             block.chainid,
             address(nft),
             tokenId,
@@ -326,7 +324,7 @@ contract AccountProxyTest is Test {
 
         vm.prank(owner, owner);
         address account = registry.createAccount(
-            address(implementation),
+            address(proxy),
             block.chainid,
             address(nft),
             tokenId,
@@ -334,19 +332,25 @@ contract AccountProxyTest is Test {
             ""
         );
 
-        ERC6551AccountUpgradeable implementation2 = new ERC6551AccountUpgradeable();
+        MockERC6551Account implementation2 = new MockERC6551Account();
+
         vm.prank(vm.addr(2));
         vm.expectRevert("Caller is not owner");
         ERC6551AccountUpgradeable(payable(account)).upgrade(address(implementation2));
 
         vm.prank(owner);
         ERC6551AccountUpgradeable(payable(account)).upgrade(address(implementation2));
-        (bool success, bytes memory data) = account.call(
-            abi.encodeWithSignature("implementation()")
+
+        bytes32 rawImplementation = vm.load(
+            account,
+            0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc
         );
-        require(success);
-        address newImplementation = abi.decode(data, (address));
-        assertEq(newImplementation, address(implementation2));
+
+        assertEq(address(uint160(uint256(rawImplementation))), address(implementation2));
+
+        vm.prank(owner);
+        vm.expectRevert("disabled");
+        ERC6551AccountUpgradeable(payable(account)).executeCall(owner, 0, "");
     }
 
     function testERC721Receive() public {

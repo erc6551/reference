@@ -13,7 +13,7 @@ import "openzeppelin-contracts/token/ERC721/IERC721Receiver.sol";
 import "openzeppelin-contracts/token/ERC1155/IERC1155Receiver.sol";
 
 import "../../interfaces/IERC6551Account.sol";
-import "../../lib/ERC6551AccountBytecode.sol";
+import "../../lib/ERC6551AccountLib.sol";
 
 /**
  * @title ERC6551AccountUpgradeable
@@ -83,8 +83,7 @@ contract ERC6551AccountUpgradeable is
         internal
         view
     {
-        (uint256 _chainId, address _contractAddress, uint256 _tokenId) = ERC6551AccountBytecode
-            .token();
+        (uint256 _chainId, address _contractAddress, uint256 _tokenId) = ERC6551AccountLib.token();
         require(
             _chainId != block.chainid ||
                 receivedTokenAddress != _contractAddress ||
@@ -133,15 +132,14 @@ contract ERC6551AccountUpgradeable is
             uint256
         )
     {
-        return ERC6551AccountBytecode.token();
+        return ERC6551AccountLib.token();
     }
 
     /**
      * @dev {See IERC6551Account-owner}
      */
     function owner() public view override returns (address) {
-        (uint256 chainId, address contractAddress, uint256 tokenId) = ERC6551AccountBytecode
-            .token();
+        (uint256 chainId, address contractAddress, uint256 tokenId) = ERC6551AccountLib.token();
         if (chainId != block.chainid) return address(0);
         return IERC721(contractAddress).ownerOf(tokenId);
     }
