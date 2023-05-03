@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.13;
+pragma solidity ^0.8.0;
 
 interface IERC6551AccountProxy {
     function implementation() external view returns (address);
@@ -20,7 +20,11 @@ interface IERC6551Account {
     function token()
         external
         view
-        returns (uint256 chainId, address tokenContract, uint256 tokenId);
+        returns (
+            uint256 chainId,
+            address tokenContract,
+            uint256 tokenId
+        );
 
     function owner() external view returns (address);
 
