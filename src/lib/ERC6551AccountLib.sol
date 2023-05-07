@@ -1,7 +1,31 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
+import "openzeppelin-contracts/utils/Create2.sol";
+import "./ERC6551BytecodeLib.sol";
+
 library ERC6551AccountLib {
+    function computeAddress(
+        address registry,
+        address implementation,
+        uint256 chainId,
+        address tokenContract,
+        uint256 tokenId,
+        uint256 _salt
+    ) internal pure returns (address) {
+        bytes32 bytecodeHash = keccak256(
+            ERC6551BytecodeLib.getCreationCode(
+                implementation,
+                chainId,
+                tokenContract,
+                tokenId,
+                _salt
+            )
+        );
+
+        return Create2.computeAddress(bytes32(_salt), bytecodeHash, registry);
+    }
+
     function token()
         internal
         view
