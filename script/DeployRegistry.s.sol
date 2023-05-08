@@ -8,7 +8,7 @@ import "../src/ERC6551Registry.sol";
 
 contract DeployRegistry is Script {
     function run() external {
-        uint256 deployerPrivateKey = vm.envUint("TESTNET_PRIVATE_KEY");
+        uint256 deployerPrivateKey = vm.envUint("MAINNET_PRIVATE_KEY");
         vm.startBroadcast(deployerPrivateKey);
 
         new ERC6551Registry{
