@@ -2,6 +2,7 @@
 src = 'src'
 out = 'out'
 libs = ['lib']
+solc-version = "0.8.17"
 
 [rpc_endpoints]
 goerli = "${GOERLI_RPC_URL}"
