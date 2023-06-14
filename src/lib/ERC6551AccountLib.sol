@@ -39,7 +39,7 @@ library ERC6551AccountLib {
 
         assembly {
             // copy 0x60 bytes from end of footer
-            extcodecopy(address(), add(footer, 0x20), 0x4d, 0xad)
+            extcodecopy(address(), add(footer, 0x20), 0x4d, 0x60)
         }
 
         return abi.decode(footer, (uint256, address, uint256));
@@ -50,7 +50,7 @@ library ERC6551AccountLib {
 
         assembly {
             // copy 0x20 bytes from beginning of footer
-            extcodecopy(address(), add(footer, 0x20), 0x2d, 0x4d)
+            extcodecopy(address(), add(footer, 0x20), 0x2d, 0x20)
         }
 
         return abi.decode(footer, (uint256));
