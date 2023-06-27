@@ -475,4 +475,9 @@ contract AccountProxyTest is Test {
 
         assertEq(nft.ownerOf(200), newTokenOwner);
     }
+
+    function testProxyZeroAddressInit() public {
+        vm.expectRevert(InvalidImplementation.selector);
+        new ERC6551AccountProxy(address(0));
+    }
 }
