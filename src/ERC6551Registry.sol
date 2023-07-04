@@ -7,8 +7,6 @@ import "./interfaces/IERC6551Registry.sol";
 import "./lib/ERC6551BytecodeLib.sol";
 
 contract ERC6551Registry is IERC6551Registry {
-    error InitializationFailed();
-
     function createAccount(
         address implementation,
         uint256 chainId,
@@ -34,8 +32,15 @@ contract ERC6551Registry is IERC6551Registry {
         _account = Create2.deploy(0, bytes32(salt), code);
 
         if (initData.length != 0) {
-            (bool success, ) = _account.call(initData);
-            if (!success) revert InitializationFailed();
+            (bool success, bytes memory result) = _account.call(
+                abi.encodePacked(initData, msg.sender)
+            );
+
+            if (!success) {
+                assembly {
+                    revert(add(result, 32), mload(result))
+                }
+            }
         }
 
         return _account;
