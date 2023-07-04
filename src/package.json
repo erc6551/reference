@@ -1,0 +1,8 @@
+{
+  "name": "@erc6551/reference",
+  "version": "0.2.0",
+  "files": [
+    "**/*.sol"
+  ],
+  "description": "ERC-6551 reference implementation"
+}

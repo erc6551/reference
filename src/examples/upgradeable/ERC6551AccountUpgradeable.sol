@@ -3,14 +3,14 @@ pragma solidity ^0.8.0;
 
 /// @author: manifold.xyz
 
-import "openzeppelin-contracts/interfaces/IERC1271.sol";
-import "openzeppelin-contracts/utils/cryptography/SignatureChecker.sol";
-import "openzeppelin-contracts/utils/introspection/IERC165.sol";
-import "openzeppelin-contracts/utils/introspection/ERC165Checker.sol";
-import "openzeppelin-contracts/utils/StorageSlot.sol";
-import "openzeppelin-contracts/token/ERC721/IERC721.sol";
-import "openzeppelin-contracts/token/ERC721/IERC721Receiver.sol";
-import "openzeppelin-contracts/token/ERC1155/IERC1155Receiver.sol";
+import "@openzeppelin/contracts/interfaces/IERC1271.sol";
+import "@openzeppelin/contracts/utils/cryptography/SignatureChecker.sol";
+import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
+import "@openzeppelin/contracts/utils/introspection/ERC165Checker.sol";
+import "@openzeppelin/contracts/utils/StorageSlot.sol";
+import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
+import "@openzeppelin/contracts/token/ERC1155/IERC1155Receiver.sol";
 
 import "../../interfaces/IERC6551Account.sol";
 import "../../lib/ERC6551AccountLib.sol";
