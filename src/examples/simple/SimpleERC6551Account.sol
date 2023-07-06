@@ -7,10 +7,11 @@ import "@openzeppelin/contracts/interfaces/IERC1271.sol";
 import "@openzeppelin/contracts/utils/cryptography/SignatureChecker.sol";
 
 import "../../interfaces/IERC6551Account.sol";
+import "../../interfaces/IERC6551Executable.sol";
 import "../../lib/ERC6551AccountLib.sol";
 
-contract SimpleERC6551Account is IERC165, IERC1271, IERC6551Account {
-    uint256 public nonce;
+contract SimpleERC6551Account is IERC165, IERC1271, IERC6551Account, IERC6551Executable {
+    uint256 public state;
 
     receive() external payable {}
 
@@ -19,11 +20,9 @@ contract SimpleERC6551Account is IERC165, IERC1271, IERC6551Account {
         uint256 value,
         bytes calldata data
     ) external payable returns (bytes memory result) {
-        require(msg.sender == owner(), "Not token owner");
+        require(_isValidSigner(msg.sender), "Invalid signer");
 
-        ++nonce;
-
-        emit TransactionExecuted(to, value, data);
+        ++state;
 
         bool success;
         (success, result) = to.call{value: value}(data);
@@ -35,28 +34,12 @@ contract SimpleERC6551Account is IERC165, IERC1271, IERC6551Account {
         }
     }
 
-    function token()
-        external
-        view
-        returns (
-            uint256,
-            address,
-            uint256
-        )
-    {
-        return ERC6551AccountLib.token();
-    }
+    function isValidSigner(address signer) external view returns (bytes4) {
+        if (_isValidSigner(signer)) {
+            return IERC6551Account.isValidSigner.selector;
+        }
 
-    function owner() public view returns (address) {
-        (uint256 chainId, address tokenContract, uint256 tokenId) = this.token();
-        if (chainId != block.chainid) return address(0);
-
-        return IERC721(tokenContract).ownerOf(tokenId);
-    }
-
-    function supportsInterface(bytes4 interfaceId) public pure returns (bool) {
-        return (interfaceId == type(IERC165).interfaceId ||
-            interfaceId == type(IERC6551Account).interfaceId);
+        return bytes4(0);
     }
 
     function isValidSignature(bytes32 hash, bytes memory signature)
@@ -71,5 +54,34 @@ contract SimpleERC6551Account is IERC165, IERC1271, IERC6551Account {
         }
 
         return "";
+    }
+
+    function token()
+        public
+        view
+        returns (
+            uint256,
+            address,
+            uint256
+        )
+    {
+        return ERC6551AccountLib.token();
+    }
+
+    function owner() public view returns (address) {
+        (uint256 chainId, address tokenContract, uint256 tokenId) = token();
+        if (chainId != block.chainid) return address(0);
+
+        return IERC721(tokenContract).ownerOf(tokenId);
+    }
+
+    function supportsInterface(bytes4 interfaceId) external pure returns (bool) {
+        return (interfaceId == type(IERC165).interfaceId ||
+            interfaceId == type(IERC6551Account).interfaceId ||
+            interfaceId == type(IERC6551Executable).interfaceId);
+    }
+
+    function _isValidSigner(address signer) internal view returns (bool) {
+        return signer == owner();
     }
 }

@@ -89,13 +89,13 @@ contract AccountProxyTest is Test {
         assertEq(chainId_, block.chainid);
         assertEq(tokenAddress_, address(nft));
         assertEq(tokenId_, tokenId);
-        assertEq(accountInstance.owner(), owner);
+        assertEq(accountInstance.isValidSigner(owner), IERC6551Account.isValidSigner.selector);
 
         // Transfer token to new owner and make sure account owner changes
         address newOwner = vm.addr(2);
         vm.prank(owner);
         nft.safeTransferFrom(owner, newOwner, tokenId);
-        assertEq(accountInstance.owner(), newOwner);
+        assertEq(accountInstance.isValidSigner(newOwner), IERC6551Account.isValidSigner.selector);
     }
 
     function testPermissionControl() public {
@@ -116,17 +116,20 @@ contract AccountProxyTest is Test {
         );
 
         vm.deal(account, 1 ether);
+
         IERC6551Account accountInstance = IERC6551Account(payable(account));
+        IERC6551Executable executableAccountInstance = IERC6551Executable(account);
+
         vm.prank(vm.addr(3));
         vm.expectRevert("Caller is not owner");
-        accountInstance.executeCall(payable(vm.addr(2)), 0.5 ether, "");
+        executableAccountInstance.executeCall(payable(vm.addr(2)), 0.5 ether, "");
 
         vm.prank(owner);
-        accountInstance.executeCall(payable(vm.addr(2)), 0.5 ether, "");
+        executableAccountInstance.executeCall(payable(vm.addr(2)), 0.5 ether, "");
 
         assertEq(account.balance, 0.5 ether);
         assertEq(vm.addr(2).balance, 0.5 ether);
-        assertEq(accountInstance.nonce(), 1);
+        assertEq(accountInstance.state(), 1);
     }
 
     function testCannotOwnSelf() public {
@@ -350,7 +353,7 @@ contract AccountProxyTest is Test {
 
         vm.prank(owner);
         vm.expectRevert("disabled");
-        ERC6551AccountUpgradeable(payable(account)).executeCall(owner, 0, "");
+        IERC6551Executable(account).executeCall(owner, 0, "");
     }
 
     function testERC721Receive() public {
@@ -457,7 +460,7 @@ contract AccountProxyTest is Test {
 
         // Make sure that we can transfer out token 200
         vm.prank(owner4);
-        IERC6551Account(payable(account4)).executeCall(
+        IERC6551Executable(account4).executeCall(
             address(account3),
             0,
             abi.encodeWithSignature(
