@@ -80,7 +80,7 @@ contract ERC6551AccountUpgradeable is
         return "";
     }
 
-    function isValidSigner(address signer) external view returns (bytes4) {
+    function isValidSigner(address signer, bytes calldata) external view returns (bytes4) {
         if (_isValidSigner(signer)) {
             return IERC6551Account.isValidSigner.selector;
         }

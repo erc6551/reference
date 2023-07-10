@@ -89,13 +89,16 @@ contract AccountProxyTest is Test {
         assertEq(chainId_, block.chainid);
         assertEq(tokenAddress_, address(nft));
         assertEq(tokenId_, tokenId);
-        assertEq(accountInstance.isValidSigner(owner), IERC6551Account.isValidSigner.selector);
+        assertEq(accountInstance.isValidSigner(owner, ""), IERC6551Account.isValidSigner.selector);
 
         // Transfer token to new owner and make sure account owner changes
         address newOwner = vm.addr(2);
         vm.prank(owner);
         nft.safeTransferFrom(owner, newOwner, tokenId);
-        assertEq(accountInstance.isValidSigner(newOwner), IERC6551Account.isValidSigner.selector);
+        assertEq(
+            accountInstance.isValidSigner(newOwner, ""),
+            IERC6551Account.isValidSigner.selector
+        );
     }
 
     function testPermissionControl() public {

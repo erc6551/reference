@@ -48,7 +48,7 @@ contract MockERC6551Account is IERC165, IERC6551Account, IERC6551Executable {
         revert("disabled");
     }
 
-    function isValidSigner(address) public pure returns (bytes4) {
+    function isValidSigner(address, bytes calldata) public pure returns (bytes4) {
         revert("disabled");
     }
 

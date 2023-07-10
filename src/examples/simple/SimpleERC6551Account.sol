@@ -34,7 +34,7 @@ contract SimpleERC6551Account is IERC165, IERC1271, IERC6551Account, IERC6551Exe
         }
     }
 
-    function isValidSigner(address signer) external view returns (bytes4) {
+    function isValidSigner(address signer, bytes calldata) external view returns (bytes4) {
         if (_isValidSigner(signer)) {
             return IERC6551Account.isValidSigner.selector;
         }
@@ -56,6 +56,12 @@ contract SimpleERC6551Account is IERC165, IERC1271, IERC6551Account, IERC6551Exe
         return "";
     }
 
+    function supportsInterface(bytes4 interfaceId) external pure returns (bool) {
+        return (interfaceId == type(IERC165).interfaceId ||
+            interfaceId == type(IERC6551Account).interfaceId ||
+            interfaceId == type(IERC6551Executable).interfaceId);
+    }
+
     function token()
         public
         view
@@ -73,12 +79,6 @@ contract SimpleERC6551Account is IERC165, IERC1271, IERC6551Account, IERC6551Exe
         if (chainId != block.chainid) return address(0);
 
         return IERC721(tokenContract).ownerOf(tokenId);
-    }
-
-    function supportsInterface(bytes4 interfaceId) external pure returns (bool) {
-        return (interfaceId == type(IERC165).interfaceId ||
-            interfaceId == type(IERC6551Account).interfaceId ||
-            interfaceId == type(IERC6551Executable).interfaceId);
     }
 
     function _isValidSigner(address signer) internal view returns (bool) {

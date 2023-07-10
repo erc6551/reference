@@ -60,7 +60,10 @@ contract AccountTest is Test {
         IERC6551Account accountInstance = IERC6551Account(payable(account));
         IERC6551Executable executableAccountInstance = IERC6551Executable(account);
 
-        assertEq(accountInstance.isValidSigner(vm.addr(1)), IERC6551Account.isValidSigner.selector);
+        assertEq(
+            accountInstance.isValidSigner(vm.addr(1), ""),
+            IERC6551Account.isValidSigner.selector
+        );
 
         vm.deal(account, 1 ether);
 
