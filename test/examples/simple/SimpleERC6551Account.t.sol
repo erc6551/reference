@@ -68,7 +68,7 @@ contract AccountTest is Test {
         vm.deal(account, 1 ether);
 
         vm.prank(vm.addr(1));
-        executableAccountInstance.executeCall(payable(vm.addr(2)), 0.5 ether, "");
+        executableAccountInstance.execute(payable(vm.addr(2)), 0.5 ether, "", 0);
 
         assertEq(account.balance, 0.5 ether);
         assertEq(vm.addr(2).balance, 0.5 ether);

@@ -20,10 +20,11 @@ contract MockERC6551Account is IERC165, IERC6551Account, IERC6551Executable {
         _initialized = val;
     }
 
-    function executeCall(
+    function execute(
         address,
         uint256,
-        bytes calldata
+        bytes calldata,
+        uint256
     ) external payable returns (bytes memory) {
         revert("disabled");
     }

@@ -41,14 +41,16 @@ contract ERC6551AccountUpgradeable is
     receive() external payable {}
 
     /**
-     * @dev {See IERC6551Executable-executeCall}
+     * @dev {See IERC6551Executable-execute}
      */
-    function executeCall(
+    function execute(
         address _target,
         uint256 _value,
-        bytes calldata _data
+        bytes calldata _data,
+        uint256 _operation
     ) external payable override returns (bytes memory _result) {
         require(_isValidSigner(msg.sender), "Caller is not owner");
+        require(_operation == 0, "Only call operations are supported");
         ++state;
         bool success;
         // solhint-disable-next-line avoid-low-level-calls

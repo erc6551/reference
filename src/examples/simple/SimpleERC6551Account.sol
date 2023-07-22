@@ -15,12 +15,14 @@ contract SimpleERC6551Account is IERC165, IERC1271, IERC6551Account, IERC6551Exe
 
     receive() external payable {}
 
-    function executeCall(
+    function execute(
         address to,
         uint256 value,
-        bytes calldata data
+        bytes calldata data,
+        uint256 operation
     ) external payable returns (bytes memory result) {
         require(_isValidSigner(msg.sender), "Invalid signer");
+        require(operation == 0, "Only call operations are supported");
 
         ++state;
 

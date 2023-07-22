@@ -125,10 +125,10 @@ contract AccountProxyTest is Test {
 
         vm.prank(vm.addr(3));
         vm.expectRevert("Caller is not owner");
-        executableAccountInstance.executeCall(payable(vm.addr(2)), 0.5 ether, "");
+        executableAccountInstance.execute(payable(vm.addr(2)), 0.5 ether, "", 0);
 
         vm.prank(owner);
-        executableAccountInstance.executeCall(payable(vm.addr(2)), 0.5 ether, "");
+        executableAccountInstance.execute(payable(vm.addr(2)), 0.5 ether, "", 0);
 
         assertEq(account.balance, 0.5 ether);
         assertEq(vm.addr(2).balance, 0.5 ether);
@@ -356,7 +356,7 @@ contract AccountProxyTest is Test {
 
         vm.prank(owner);
         vm.expectRevert("disabled");
-        IERC6551Executable(account).executeCall(owner, 0, "");
+        IERC6551Executable(account).execute(owner, 0, "", 0);
     }
 
     function testERC721Receive() public {
@@ -463,11 +463,11 @@ contract AccountProxyTest is Test {
 
         // Make sure that we can transfer out token 200
         vm.prank(owner4);
-        IERC6551Executable(account4).executeCall(
+        IERC6551Executable(account4).execute(
             address(account3),
             0,
             abi.encodeWithSignature(
-                "executeCall(address,uint256,bytes)",
+                "execute(address,uint256,bytes,uint256)",
                 address(nft),
                 0,
                 abi.encodeWithSignature(
@@ -475,8 +475,10 @@ contract AccountProxyTest is Test {
                     account3,
                     newTokenOwner,
                     200
-                )
-            )
+                ),
+                0
+            ),
+            0
         );
 
         assertEq(nft.ownerOf(200), newTokenOwner);

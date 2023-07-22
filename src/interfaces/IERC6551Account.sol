@@ -17,7 +17,7 @@ interface IERC6551Account {
      * @dev Returns the identifier of the non-fungible token which owns the account
      *
      * The return value of this function MUST be constant - it MUST NOT change
-     * over time.
+     * over time
      *
      * @return chainId       The EIP-155 ID of the chain the token exists on
      * @return tokenContract The contract address of the token
@@ -46,7 +46,7 @@ interface IERC6551Account {
      * MUST return the bytes4 magic value 0x523e3260 if the given signer is valid
      *
      * By default, the holder of the non-fungible token which owns the account MUST be a valid
-     * signer.
+     * signer
      *
      * Accounts MAY implement additional authorization logic which invalidates the holder as a
      * signer or grants signing permissions to other non-holder accounts
