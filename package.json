@@ -1,10 +1,6 @@
 {
-  "name": "@erc6551/reference",
-  "version": "0.0.1",
-  "files": [
-    "/src/**/*.sol",
-    "/out/**/*.json"
-  ],
+  "name": "erc6551-reference",
+  "version": "0.2.0",
   "scripts": {
     "test": "forge test",
     "prettier": "prettier --write '{**/*,*}.{js,ts,tsx,md,mdx,yml,sol}'",
