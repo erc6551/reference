@@ -8,7 +8,6 @@ import "@openzeppelin/contracts/utils/cryptography/SignatureChecker.sol";
 
 import "../../interfaces/IERC6551Account.sol";
 import "../../interfaces/IERC6551Executable.sol";
-import "../../lib/ERC6551AccountLib.sol";
 
 contract SimpleERC6551Account is IERC165, IERC1271, IERC6551Account, IERC6551Executable {
     uint256 public state;
@@ -73,7 +72,13 @@ contract SimpleERC6551Account is IERC165, IERC1271, IERC6551Account, IERC6551Exe
             uint256
         )
     {
-        return ERC6551AccountLib.token();
+        bytes memory footer = new bytes(0x60);
+
+        assembly {
+            extcodecopy(address(), add(footer, 0x20), 0x4d, 0x60)
+        }
+
+        return abi.decode(footer, (uint256, address, uint256));
     }
 
     function owner() public view returns (address) {

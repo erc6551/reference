@@ -15,14 +15,14 @@ interface IERC6551Registry {
     );
 
     /**
-     * @dev Creates a token bound account for an non-fungible token.
+     * @dev Creates a token bound account for a non-fungible token
      *
-     * If account has already been created, returns the account address without calling create2.
+     * If account has already been created, returns the account address without calling create2
      *
      * If initData is not empty and account has not yet been created, calls account with
-     * provided initData after creation.
+     * provided initData after creation
      *
-     * Emits AccountCreated event.
+     * Emits AccountCreated event
      *
      * @return the address of the account
      */
@@ -36,9 +36,9 @@ interface IERC6551Registry {
     ) external returns (address);
 
     /**
-     * @dev Returns the computed address of a token bound account
+     * @dev Returns the computed token bound account address for a non-fungible token
      *
-     * @return The computed address of the account
+     * @return The computed address of the token bound account
      */
     function account(
         address implementation,

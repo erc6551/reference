@@ -8,12 +8,12 @@ interface IERC6551Executable {
      *
      * Reverts and bubbles up error if operation fails
      *
-     * @param to The target address of the operation
-     * @param value The ETH value to be sent to the target
-     * @param data The encoded operation calldata
+     * @param to        The target address of the operation
+     * @param value     The Ether value to be sent to the target
+     * @param data      The encoded operation calldata
      * @param operation A value indicating the type of operation to perform
      *
-     * Accounts implementing this interface MUST support following reserved operation values:
+     * Accounts implementing this interface MUST accept the following operation parameter values:
      * - 0 = CALL
      * - 1 = DELEGATECALL
      * - 2 = CREATE

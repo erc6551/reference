@@ -33,7 +33,7 @@ contract RegistryTest is Test {
         uint256 salt = 400;
         address deployedAccount;
 
-        vm.expectRevert(abi.encodeWithSelector(bytes4(keccak256("InitializationFailed()"))));
+        vm.expectRevert("disabled");
         deployedAccount = registry.createAccount(
             address(implementation),
             chainId,
