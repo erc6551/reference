@@ -8,6 +8,8 @@ import "../src/lib/ERC6551AccountLib.sol";
 import "./mocks/MockERC721.sol";
 import "./mocks/MockERC6551Account.sol";
 
+import "../src/interfaces/IERC6551Executable.sol";
+
 contract RegistryTest is Test {
     ERC6551Registry public registry;
     MockERC6551Account public implementation;
@@ -15,6 +17,13 @@ contract RegistryTest is Test {
     function setUp() public {
         registry = new ERC6551Registry();
         implementation = new MockERC6551Account();
+
+        console.log("Account Interface");
+        console.logBytes4(type(IERC6551Account).interfaceId);
+        console.log("Execution Interface");
+        console.logBytes4(type(IERC6551Executable).interfaceId);
+        console.log("isValidSigner");
+        console.logBytes4(IERC6551Account.isValidSigner.selector);
     }
 
     function testDeploy() public {
@@ -24,7 +33,7 @@ contract RegistryTest is Test {
         uint256 salt = 400;
         address deployedAccount;
 
-        vm.expectRevert(abi.encodeWithSelector(bytes4(keccak256("InitializationFailed()"))));
+        vm.expectRevert("disabled");
         deployedAccount = registry.createAccount(
             address(implementation),
             chainId,
