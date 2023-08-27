@@ -21,24 +21,13 @@ contract AccountTest is Test {
     }
 
     function testDeploy() public {
-        address deployedAccount = registry.createAccount(
-            address(implementation),
-            block.chainid,
-            address(0),
-            0,
-            0,
-            ""
-        );
+        address deployedAccount =
+            registry.createAccount(address(implementation), block.chainid, address(0), 0, 0, "");
 
         assertTrue(deployedAccount != address(0));
 
-        address predictedAccount = registry.account(
-            address(implementation),
-            block.chainid,
-            address(0),
-            0,
-            0
-        );
+        address predictedAccount =
+            registry.account(address(implementation), block.chainid, address(0), 0, 0);
 
         assertEq(predictedAccount, deployedAccount);
     }
@@ -46,14 +35,8 @@ contract AccountTest is Test {
     function testCall() public {
         nft.mint(vm.addr(1), 1);
 
-        address account = registry.createAccount(
-            address(implementation),
-            block.chainid,
-            address(nft),
-            1,
-            0,
-            ""
-        );
+        address account =
+            registry.createAccount(address(implementation), block.chainid, address(nft), 1, 0, "");
 
         assertTrue(account != address(0));
 
@@ -61,8 +44,7 @@ contract AccountTest is Test {
         IERC6551Executable executableAccountInstance = IERC6551Executable(account);
 
         assertEq(
-            accountInstance.isValidSigner(vm.addr(1), ""),
-            IERC6551Account.isValidSigner.selector
+            accountInstance.isValidSigner(vm.addr(1), ""), IERC6551Account.isValidSigner.selector
         );
 
         vm.deal(account, 1 ether);

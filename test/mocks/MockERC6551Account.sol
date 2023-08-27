@@ -20,24 +20,15 @@ contract MockERC6551Account is IERC165, IERC6551Account, IERC6551Executable {
         _initialized = val;
     }
 
-    function execute(
-        address,
-        uint256,
-        bytes calldata,
-        uint256
-    ) external payable returns (bytes memory) {
+    function execute(address, uint256, bytes calldata, uint256)
+        external
+        payable
+        returns (bytes memory)
+    {
         revert("disabled");
     }
 
-    function token()
-        external
-        view
-        returns (
-            uint256,
-            address,
-            uint256
-        )
-    {
+    function token() external view returns (uint256, address, uint256) {
         return ERC6551AccountLib.token();
     }
 
