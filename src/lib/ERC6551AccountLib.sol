@@ -22,21 +22,6 @@ library ERC6551AccountLib {
         return Create2.computeAddress(bytes32(_salt), bytecodeHash, registry);
     }
 
-    function isERC6551Account(address account, address registry) internal view returns (bool) {
-        // invalid bytecode size
-        if (account.code.length != 0xAD) return false;
-
-        address _implementation = implementation(account);
-
-        // implementation does not exist
-        if (_implementation.code.length == 0) return false;
-
-        (uint256 _salt, uint256 chainId, address tokenContract, uint256 tokenId) = context(account);
-
-        return account
-            == computeAddress(registry, _implementation, chainId, tokenContract, tokenId, _salt);
-    }
-
     function isERC6551Account(address account, address expectedImplementation, address registry)
         internal
         view
