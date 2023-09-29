@@ -44,6 +44,6 @@ For more information on writing and running tests, refer to the [Foundry testing
 
 ## History
 
-**0.2.1**
+**0.2.2**
 
 - Making examples' functions `virtual` so that the examples can be used as a base for more advanced contracts
