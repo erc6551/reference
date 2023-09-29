@@ -19,7 +19,7 @@ contract SimpleERC6551Account is IERC165, IERC1271, IERC6551Account, IERC6551Exe
         uint256 value,
         bytes calldata data,
         uint256 operation
-    ) external payable virtual returns (bytes memory result) {
+    ) public payable virtual returns (bytes memory result) {
         require(_isValidSigner(msg.sender), "Invalid signer");
         require(operation == 0, "Only call operations are supported");
 
@@ -35,7 +35,7 @@ contract SimpleERC6551Account is IERC165, IERC1271, IERC6551Account, IERC6551Exe
         }
     }
 
-    function isValidSigner(address signer, bytes calldata) external view virtual returns (bytes4) {
+    function isValidSigner(address signer, bytes calldata) public view virtual returns (bytes4) {
         if (_isValidSigner(signer)) {
             return IERC6551Account.isValidSigner.selector;
         }
@@ -44,7 +44,7 @@ contract SimpleERC6551Account is IERC165, IERC1271, IERC6551Account, IERC6551Exe
     }
 
     function isValidSignature(bytes32 hash, bytes memory signature)
-        external
+        public
         view
         virtual
         returns (bytes4 magicValue)
@@ -58,7 +58,7 @@ contract SimpleERC6551Account is IERC165, IERC1271, IERC6551Account, IERC6551Exe
         return "";
     }
 
-    function supportsInterface(bytes4 interfaceId) external pure virtual returns (bool) {
+    function supportsInterface(bytes4 interfaceId) public pure virtual returns (bool) {
         return (interfaceId == type(IERC165).interfaceId ||
             interfaceId == type(IERC6551Account).interfaceId ||
             interfaceId == type(IERC6551Executable).interfaceId);

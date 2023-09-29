@@ -48,7 +48,7 @@ contract ERC6551AccountUpgradeable is
         uint256 _value,
         bytes calldata _data,
         uint256 _operation
-    ) external payable virtual override returns (bytes memory _result) {
+    ) public payable virtual override returns (bytes memory _result) {
         require(_isValidSigner(msg.sender), "Caller is not owner");
         require(_operation == 0, "Only call operations are supported");
         ++state;
@@ -62,7 +62,7 @@ contract ERC6551AccountUpgradeable is
     /**
      * @dev Upgrades the implementation.  Only the token owner can call this.
      */
-    function upgrade(address implementation_) external virtual {
+    function upgrade(address implementation_) public virtual {
         require(_isValidSigner(msg.sender), "Caller is not owner");
         require(implementation_ != address(0), "Invalid implementation address");
         ++state;
@@ -70,7 +70,7 @@ contract ERC6551AccountUpgradeable is
     }
 
     function isValidSignature(bytes32 hash, bytes memory signature)
-        external
+        public
         view virtual
         returns (bytes4 magicValue)
     {
@@ -82,7 +82,7 @@ contract ERC6551AccountUpgradeable is
         return "";
     }
 
-    function isValidSigner(address signer, bytes calldata) external view virtual returns (bytes4) {
+    function isValidSigner(address signer, bytes calldata) public view virtual returns (bytes4) {
         if (_isValidSigner(signer)) {
             return IERC6551Account.isValidSigner.selector;
         }
@@ -95,7 +95,7 @@ contract ERC6551AccountUpgradeable is
         address,
         uint256 receivedTokenId,
         bytes memory
-    ) external view virtual returns (bytes4) {
+    ) public view virtual returns (bytes4) {
         _revertIfOwnershipCycle(msg.sender, receivedTokenId);
         return IERC721Receiver.onERC721Received.selector;
     }
@@ -106,7 +106,7 @@ contract ERC6551AccountUpgradeable is
         uint256,
         uint256,
         bytes memory
-    ) external pure virtual returns (bytes4) {
+    ) public pure virtual returns (bytes4) {
         return IERC1155Receiver.onERC1155Received.selector;
     }
 
@@ -116,11 +116,11 @@ contract ERC6551AccountUpgradeable is
         uint256[] memory,
         uint256[] memory,
         bytes memory
-    ) external pure virtual returns (bytes4) {
+    ) public pure virtual returns (bytes4) {
         return IERC1155Receiver.onERC1155BatchReceived.selector;
     }
 
-    function supportsInterface(bytes4 interfaceId) external pure returns (bool) {
+    function supportsInterface(bytes4 interfaceId) public pure returns (bool) {
         return (interfaceId == type(IERC6551Account).interfaceId ||
             interfaceId == type(IERC6551Executable).interfaceId ||
             interfaceId == type(IERC1155Receiver).interfaceId ||
