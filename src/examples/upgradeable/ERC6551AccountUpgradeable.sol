@@ -120,7 +120,7 @@ contract ERC6551AccountUpgradeable is
         return IERC1155Receiver.onERC1155BatchReceived.selector;
     }
 
-    function supportsInterface(bytes4 interfaceId) public pure returns (bool) {
+    function supportsInterface(bytes4 interfaceId) public pure virtual returns (bool) {
         return (interfaceId == type(IERC6551Account).interfaceId ||
             interfaceId == type(IERC6551Executable).interfaceId ||
             interfaceId == type(IERC1155Receiver).interfaceId ||
