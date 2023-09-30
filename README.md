@@ -40,3 +40,10 @@ forge test
 ```
 
 For more information on writing and running tests, refer to the [Foundry testing guide](https://github.com/foundry-rs/book/blob/master/src/forge/writing-tests.md).
+
+
+## History
+
+**0.2.1**
+
+- Making examples' functions `virtual` and `public` so that the examples can be used as a base for more advanced contracts
