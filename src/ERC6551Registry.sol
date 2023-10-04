@@ -27,7 +27,7 @@ contract ERC6551Registry is IERC6551Registry {
 
         if (_account.code.length != 0) return _account;
 
-        emit AccountCreated(_account, implementation, salt, chainId, tokenContract, tokenId);
+        emit ERC6551AccountCreated(_account, implementation, salt, chainId, tokenContract, tokenId);
 
         assembly {
             _account := create2(0, add(code, 0x20), mload(code), salt)
