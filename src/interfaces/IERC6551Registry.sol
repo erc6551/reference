@@ -3,7 +3,7 @@ pragma solidity ^0.8.0;
 
 interface IERC6551Registry {
     /**
-     * @dev The registry SHALL emit the AccountCreated event upon successful account creation
+     * @dev The registry SHALL emit the ERC6551AccountCreated event upon successful account creation
      */
     event ERC6551AccountCreated(
         address account,
@@ -22,7 +22,7 @@ interface IERC6551Registry {
      * If initData is not empty and account has not yet been created, calls account with
      * provided initData after creation
      *
-     * Emits AccountCreated event
+     * Emits ERC6551AccountCreated event
      *
      * @return the address of the account
      */
