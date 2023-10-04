@@ -341,7 +341,7 @@ contract AccountProxyTest is Test {
             address(account3),
             0,
             abi.encodeWithSignature(
-                "execute(address,uint256,bytes,uint256)",
+                "execute(address,uint256,bytes,uint8)",
                 address(nft),
                 0,
                 abi.encodeWithSignature(

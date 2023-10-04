@@ -22,6 +22,8 @@ contract RegistryTest is Test {
         console.logBytes4(type(IERC6551Account).interfaceId);
         console.log("Execution Interface");
         console.logBytes4(type(IERC6551Executable).interfaceId);
+        console.log("execute selector");
+        console.logBytes4(IERC6551Executable.execute.selector);
         console.log("isValidSigner");
         console.logBytes4(IERC6551Account.isValidSigner.selector);
     }

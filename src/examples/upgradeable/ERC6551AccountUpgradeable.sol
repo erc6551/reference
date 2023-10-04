@@ -43,7 +43,7 @@ contract ERC6551AccountUpgradeable is
     /**
      * @dev {See IERC6551Executable-execute}
      */
-    function execute(address _target, uint256 _value, bytes calldata _data, uint256 _operation)
+    function execute(address _target, uint256 _value, bytes calldata _data, uint8 _operation)
         external
         payable
         override
