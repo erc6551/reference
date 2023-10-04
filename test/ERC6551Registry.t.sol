@@ -30,30 +30,19 @@ contract RegistryTest is Test {
         uint256 chainId = 100;
         address tokenAddress = address(200);
         uint256 tokenId = 300;
-        uint256 salt = 400;
-        address deployedAccount;
+        bytes32 salt = bytes32(uint256(400));
 
-        vm.expectRevert("disabled");
-        deployedAccount = registry.createAccount(
+         address deployedAccount = registry.createAccount(
             address(implementation),
+            salt,
             chainId,
             tokenAddress,
-            tokenId,
-            salt,
-            abi.encodeWithSignature("initialize(bool)", false)
-        );
-
-        deployedAccount = registry.createAccount(
-            address(implementation),
-            chainId,
-            tokenAddress,
-            tokenId,
-            salt,
-            abi.encodeWithSignature("initialize(bool)", true)
+            tokenId
         );
 
         address registryComputedAddress =
-            registry.account(address(implementation), chainId, tokenAddress, tokenId, salt);
+            registry.account(address(implementation), salt, chainId, tokenAddress, tokenId);
+
         assertEq(deployedAccount, registryComputedAddress);
     }
 }

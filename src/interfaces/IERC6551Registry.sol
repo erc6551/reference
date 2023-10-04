@@ -8,10 +8,10 @@ interface IERC6551Registry {
     event AccountCreated(
         address account,
         address indexed implementation,
+        bytes32 salt,
         uint256 chainId,
         address indexed tokenContract,
-        uint256 indexed tokenId,
-        uint256 salt
+        uint256 indexed tokenId
     );
 
     /**
@@ -28,11 +28,10 @@ interface IERC6551Registry {
      */
     function createAccount(
         address implementation,
+        bytes32 salt,
         uint256 chainId,
         address tokenContract,
-        uint256 tokenId,
-        uint256 seed,
-        bytes calldata initData
+        uint256 tokenId
     ) external returns (address);
 
     /**
@@ -42,9 +41,9 @@ interface IERC6551Registry {
      */
     function account(
         address implementation,
+        bytes32 salt,
         uint256 chainId,
         address tokenContract,
-        uint256 tokenId,
-        uint256 salt
+        uint256 tokenId
     ) external view returns (address);
 }

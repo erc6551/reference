@@ -32,7 +32,7 @@ contract MockERC6551Account is IERC165, IERC6551Account, IERC6551Executable {
         return ERC6551AccountLib.token();
     }
 
-    function salt() external view returns (uint256) {
+    function salt() external view returns (bytes32) {
         return ERC6551AccountLib.salt();
     }
 
