@@ -18,12 +18,14 @@ contract RegistryTest is Test {
         registry = new ERC6551Registry();
         implementation = new MockERC6551Account();
 
+        // Ensure interface IDs don't unexpectedly change
+        assertEq(type(IERC6551Account).interfaceId, bytes4(0x6faff5f1));
+        assertEq(type(IERC6551Executable).interfaceId, bytes4(0x51945447));
+
         console.log("Account Interface");
         console.logBytes4(type(IERC6551Account).interfaceId);
         console.log("Execution Interface");
         console.logBytes4(type(IERC6551Executable).interfaceId);
-        console.log("execute selector");
-        console.logBytes4(IERC6551Executable.execute.selector);
         console.log("isValidSigner");
         console.logBytes4(IERC6551Account.isValidSigner.selector);
     }
