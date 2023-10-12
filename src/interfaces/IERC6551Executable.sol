@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-/// @dev the ERC-165 identifier for this interface is `0x74420f4c`
+/// @dev the ERC-165 identifier for this interface is `0x51945447`
 interface IERC6551Executable {
     /**
      * @dev Executes a low-level operation if the caller is a valid signer on the account
@@ -24,7 +24,7 @@ interface IERC6551Executable {
      *
      * @return The result of the operation
      */
-    function execute(address to, uint256 value, bytes calldata data, uint256 operation)
+    function execute(address to, uint256 value, bytes calldata data, uint8 operation)
         external
         payable
         returns (bytes memory);

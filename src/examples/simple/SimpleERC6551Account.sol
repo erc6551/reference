@@ -14,7 +14,7 @@ contract SimpleERC6551Account is IERC165, IERC1271, IERC6551Account, IERC6551Exe
 
     receive() external payable {}
 
-    function execute(address to, uint256 value, bytes calldata data, uint256 operation)
+    function execute(address to, uint256 value, bytes calldata data, uint8 operation)
         external
         payable
         returns (bytes memory result)

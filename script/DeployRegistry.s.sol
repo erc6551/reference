@@ -8,8 +8,7 @@ import "../src/ERC6551Registry.sol";
 
 contract DeployRegistry is Script {
     function run() external {
-        uint256 deployerPrivateKey = vm.envUint("TESTNET_PRIVATE_KEY");
-        vm.startBroadcast(deployerPrivateKey);
+        vm.startBroadcast();
 
         new ERC6551Registry{
             salt: 0x6551655165516551655165516551655165516551655165516551655165516551

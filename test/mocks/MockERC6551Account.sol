@@ -20,7 +20,7 @@ contract MockERC6551Account is IERC165, IERC6551Account, IERC6551Executable {
         _initialized = val;
     }
 
-    function execute(address, uint256, bytes calldata, uint256)
+    function execute(address, uint256, bytes calldata, uint8)
         external
         payable
         returns (bytes memory)
@@ -32,7 +32,7 @@ contract MockERC6551Account is IERC165, IERC6551Account, IERC6551Executable {
         return ERC6551AccountLib.token();
     }
 
-    function salt() external view returns (uint256) {
+    function salt() external view returns (bytes32) {
         return ERC6551AccountLib.salt();
     }
 

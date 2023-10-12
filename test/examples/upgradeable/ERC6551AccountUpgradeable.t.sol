@@ -26,17 +26,17 @@ contract AccountProxyTest is Test {
     function testDeploy() public {
         address owner = vm.addr(1);
         uint256 tokenId = 100;
-        uint256 salt = 200;
+        bytes32 salt = bytes32(uint256(200));
 
         address predictedAccount =
-            registry.account(address(proxy), block.chainid, address(nft), tokenId, salt);
+            registry.account(address(proxy), salt, block.chainid, address(nft), tokenId);
 
         nft.mint(owner, tokenId);
 
         vm.prank(owner, owner);
 
         address deployedAccount =
-            registry.createAccount(address(proxy), block.chainid, address(nft), tokenId, salt, "");
+            registry.createAccount(address(proxy), salt, block.chainid, address(nft), tokenId);
 
         assertTrue(deployedAccount != address(0));
 
@@ -44,20 +44,20 @@ contract AccountProxyTest is Test {
 
         // Create account is idempotent
         deployedAccount =
-            registry.createAccount(address(proxy), block.chainid, address(nft), tokenId, salt, "");
+            registry.createAccount(address(proxy), salt, block.chainid, address(nft), tokenId);
         assertEq(predictedAccount, deployedAccount);
     }
 
     function testTokenAndOwnership() public {
         address owner = vm.addr(1);
         uint256 tokenId = 100;
-        uint256 salt = 200;
+        bytes32 salt = bytes32(uint256(200));
 
         nft.mint(owner, tokenId);
 
         vm.prank(owner, owner);
         address account =
-            registry.createAccount(address(proxy), block.chainid, address(nft), tokenId, salt, "");
+            registry.createAccount(address(proxy), salt, block.chainid, address(nft), tokenId);
 
         IERC6551Account accountInstance = IERC6551Account(payable(account));
 
@@ -80,13 +80,13 @@ contract AccountProxyTest is Test {
     function testPermissionControl() public {
         address owner = vm.addr(1);
         uint256 tokenId = 100;
-        uint256 salt = 200;
+        bytes32 salt = bytes32(uint256(200));
 
         nft.mint(owner, tokenId);
 
         vm.prank(owner, owner);
         address account = registry.createAccount(
-            address(implementation), block.chainid, address(nft), tokenId, salt, ""
+            address(implementation), salt, block.chainid, address(nft), tokenId
         );
 
         vm.deal(account, 1 ether);
@@ -109,13 +109,13 @@ contract AccountProxyTest is Test {
     function testCannotOwnSelf() public {
         address owner = vm.addr(1);
         uint256 tokenId = 100;
-        uint256 salt = 200;
+        bytes32 salt = bytes32(uint256(200));
 
         nft.mint(owner, tokenId);
 
         vm.prank(owner, owner);
         address account = registry.createAccount(
-            address(implementation), block.chainid, address(nft), tokenId, salt, ""
+            address(implementation), salt, block.chainid, address(nft), tokenId
         );
 
         vm.prank(owner);
@@ -142,15 +142,15 @@ contract AccountProxyTest is Test {
 
         vm.prank(owner1, owner1);
         address account1 = registry.createAccount(
-            address(implementation), block.chainid, address(nft1), tokenId1, 0, ""
+            address(implementation), 0, block.chainid, address(nft1), tokenId1
         );
         vm.prank(owner2, owner2);
         address account2 = registry.createAccount(
-            address(implementation), block.chainid, address(nft2), tokenId2, 0, ""
+            address(implementation), 0, block.chainid, address(nft2), tokenId2
         );
         vm.prank(owner3, owner3);
         address account3 = registry.createAccount(
-            address(implementation), block.chainid, address(nft3), tokenId3, 0, ""
+            address(implementation), 0, block.chainid, address(nft3), tokenId3
         );
 
         // Move token that holds nft1 token1 to the wallet of nft2 token2 (this is ok)
@@ -193,25 +193,25 @@ contract AccountProxyTest is Test {
 
         vm.prank(owner1, owner1);
         address account1 =
-            registry.createAccount(address(implementation), block.chainid, address(nft), 100, 0, "");
+            registry.createAccount(address(implementation), bytes32(0), block.chainid, address(nft), 100);
         vm.prank(owner2, owner2);
         address account2 =
-            registry.createAccount(address(implementation), block.chainid, address(nft), 200, 0, "");
+            registry.createAccount(address(implementation), bytes32(0), block.chainid, address(nft), 200);
         vm.prank(owner3, owner3);
         address account3 =
-            registry.createAccount(address(implementation), block.chainid, address(nft), 300, 0, "");
+            registry.createAccount(address(implementation), bytes32(0), block.chainid, address(nft), 300);
         vm.prank(owner4, owner4);
         address account4 =
-            registry.createAccount(address(implementation), block.chainid, address(nft), 400, 0, "");
+            registry.createAccount(address(implementation), bytes32(0), block.chainid, address(nft), 400);
         vm.prank(owner5, owner5);
         address account5 =
-            registry.createAccount(address(implementation), block.chainid, address(nft), 500, 0, "");
+            registry.createAccount(address(implementation), bytes32(0), block.chainid, address(nft), 500);
         vm.prank(owner6, owner6);
         address account6 =
-            registry.createAccount(address(implementation), block.chainid, address(nft), 600, 0, "");
+            registry.createAccount(address(implementation), bytes32(0), block.chainid, address(nft), 600);
         vm.prank(owner7, owner7);
         address account7 =
-            registry.createAccount(address(implementation), block.chainid, address(nft), 700, 0, "");
+            registry.createAccount(address(implementation), bytes32(0), block.chainid, address(nft), 700);
 
         vm.prank(owner1);
         nft.safeTransferFrom(owner1, account2, 100);
@@ -233,13 +233,13 @@ contract AccountProxyTest is Test {
     function testUpgrade() public {
         address owner = vm.addr(1);
         uint256 tokenId = 100;
-        uint256 salt = 200;
+        bytes32 salt = bytes32(uint256(200));
 
         nft.mint(owner, tokenId);
 
         vm.prank(owner, owner);
         address account =
-            registry.createAccount(address(proxy), block.chainid, address(nft), tokenId, salt, "");
+            registry.createAccount(address(proxy), salt, block.chainid, address(nft), tokenId);
 
         MockERC6551Account implementation2 = new MockERC6551Account();
 
@@ -268,7 +268,7 @@ contract AccountProxyTest is Test {
 
         vm.prank(owner, owner);
         address account = registry.createAccount(
-            address(implementation), block.chainid, address(nft), tokenId, 0, ""
+            address(implementation), bytes32(0), block.chainid, address(nft), tokenId
         );
 
         address otherOwner = vm.addr(2);
@@ -288,7 +288,7 @@ contract AccountProxyTest is Test {
 
         vm.prank(owner, owner);
         address account = registry.createAccount(
-            address(implementation), block.chainid, address(nft), tokenId, 0, ""
+            address(implementation), bytes32(0), block.chainid, address(nft), tokenId
         );
 
         uint256 tokenId1155 = 200;
@@ -309,6 +309,7 @@ contract AccountProxyTest is Test {
         address owner3 = vm.addr(3);
         address owner4 = vm.addr(4);
         address newTokenOwner = vm.addr(7);
+        bytes32 salt = bytes32(uint256(0));
 
         nft.mint(owner1, 100);
         nft.mint(owner2, 200);
@@ -316,16 +317,16 @@ contract AccountProxyTest is Test {
         nft.mint(owner4, 400);
 
         vm.prank(owner1, owner1);
-        registry.createAccount(address(implementation), block.chainid, address(nft), 100, 0, "");
+        registry.createAccount(address(implementation), salt, block.chainid, address(nft), 100);
         vm.prank(owner2, owner2);
         address account2 =
-            registry.createAccount(address(implementation), block.chainid, address(nft), 200, 0, "");
+            registry.createAccount(address(implementation), salt, block.chainid, address(nft), 200);
         vm.prank(owner3, owner3);
         address account3 =
-            registry.createAccount(address(implementation), block.chainid, address(nft), 300, 0, "");
+            registry.createAccount(address(implementation), salt, block.chainid, address(nft), 300);
         vm.prank(owner4, owner4);
         address account4 =
-            registry.createAccount(address(implementation), block.chainid, address(nft), 400, 0, "");
+            registry.createAccount(address(implementation), salt, block.chainid, address(nft), 400);
 
         vm.prank(owner1);
         nft.safeTransferFrom(owner1, account2, 100);
@@ -340,7 +341,7 @@ contract AccountProxyTest is Test {
             address(account3),
             0,
             abi.encodeWithSignature(
-                "execute(address,uint256,bytes,uint256)",
+                "execute(address,uint256,bytes,uint8)",
                 address(nft),
                 0,
                 abi.encodeWithSignature(

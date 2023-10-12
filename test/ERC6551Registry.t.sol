@@ -18,6 +18,10 @@ contract RegistryTest is Test {
         registry = new ERC6551Registry();
         implementation = new MockERC6551Account();
 
+        // Ensure interface IDs don't unexpectedly change
+        assertEq(type(IERC6551Account).interfaceId, bytes4(0x6faff5f1));
+        assertEq(type(IERC6551Executable).interfaceId, bytes4(0x51945447));
+
         console.log("Account Interface");
         console.logBytes4(type(IERC6551Account).interfaceId);
         console.log("Execution Interface");
@@ -30,30 +34,19 @@ contract RegistryTest is Test {
         uint256 chainId = 100;
         address tokenAddress = address(200);
         uint256 tokenId = 300;
-        uint256 salt = 400;
-        address deployedAccount;
+        bytes32 salt = bytes32(uint256(400));
 
-        vm.expectRevert("disabled");
-        deployedAccount = registry.createAccount(
+         address deployedAccount = registry.createAccount(
             address(implementation),
+            salt,
             chainId,
             tokenAddress,
-            tokenId,
-            salt,
-            abi.encodeWithSignature("initialize(bool)", false)
-        );
-
-        deployedAccount = registry.createAccount(
-            address(implementation),
-            chainId,
-            tokenAddress,
-            tokenId,
-            salt,
-            abi.encodeWithSignature("initialize(bool)", true)
+            tokenId
         );
 
         address registryComputedAddress =
-            registry.account(address(implementation), chainId, tokenAddress, tokenId, salt);
+            registry.account(address(implementation), salt, chainId, tokenAddress, tokenId);
+
         assertEq(deployedAccount, registryComputedAddress);
     }
 }

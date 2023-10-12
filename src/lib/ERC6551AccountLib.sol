@@ -2,24 +2,24 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/utils/Create2.sol";
-import "./ERC6551BytecodeLib.sol";
+import {ERC6551BytecodeLib} from "../ERC6551Registry.sol";
 
 library ERC6551AccountLib {
     function computeAddress(
         address registry,
         address _implementation,
+        bytes32 _salt,
         uint256 chainId,
         address tokenContract,
-        uint256 tokenId,
-        uint256 _salt
+        uint256 tokenId
     ) internal pure returns (address) {
         bytes32 bytecodeHash = keccak256(
             ERC6551BytecodeLib.getCreationCode(
-                _implementation, chainId, tokenContract, tokenId, _salt
+                _implementation, _salt, chainId, tokenContract, tokenId
             )
         );
 
-        return Create2.computeAddress(bytes32(_salt), bytecodeHash, registry);
+        return Create2.computeAddress(_salt, bytecodeHash, registry);
     }
 
     function isERC6551Account(address account, address expectedImplementation, address registry)
@@ -38,10 +38,10 @@ library ERC6551AccountLib {
         // invalid implementation
         if (_implementation != expectedImplementation) return false;
 
-        (uint256 _salt, uint256 chainId, address tokenContract, uint256 tokenId) = context(account);
+        (bytes32 _salt, uint256 chainId, address tokenContract, uint256 tokenId) = context(account);
 
         return account
-            == computeAddress(registry, _implementation, chainId, tokenContract, tokenId, _salt);
+            == computeAddress(registry, _implementation, _salt, chainId, tokenContract, tokenId );
     }
 
     function implementation(address account) internal view returns (address _implementation) {
@@ -71,7 +71,7 @@ library ERC6551AccountLib {
         return token(address(this));
     }
 
-    function salt(address account) internal view returns (uint256) {
+    function salt(address account) internal view returns (bytes32) {
         bytes memory encodedData = new bytes(0x20);
 
         assembly {
@@ -79,14 +79,14 @@ library ERC6551AccountLib {
             extcodecopy(account, add(encodedData, 0x20), 0x2d, 0x20)
         }
 
-        return abi.decode(encodedData, (uint256));
+        return abi.decode(encodedData, (bytes32));
     }
 
-    function salt() internal view returns (uint256) {
+    function salt() internal view returns (bytes32) {
         return salt(address(this));
     }
 
-    function context(address account) internal view returns (uint256, uint256, address, uint256) {
+    function context(address account) internal view returns (bytes32, uint256, address, uint256) {
         bytes memory encodedData = new bytes(0x80);
 
         assembly {
@@ -94,10 +94,10 @@ library ERC6551AccountLib {
             extcodecopy(account, add(encodedData, 0x20), 0x2D, 0x80)
         }
 
-        return abi.decode(encodedData, (uint256, uint256, address, uint256));
+        return abi.decode(encodedData, (bytes32, uint256, address, uint256));
     }
 
-    function context() internal view returns (uint256, uint256, address, uint256) {
+    function context() internal view returns (bytes32, uint256, address, uint256) {
         return context(address(this));
     }
 }
