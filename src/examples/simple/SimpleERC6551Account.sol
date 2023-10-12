@@ -34,7 +34,7 @@ contract SimpleERC6551Account is IERC165, IERC1271, IERC6551Account, IERC6551Exe
         }
     }
 
-    function isValidSigner(address signer, bytes calldata) external view returns (bytes4) {
+    function isValidSigner(address signer, bytes calldata) public view virtual returns (bytes4) {
         if (_isValidSigner(signer)) {
             return IERC6551Account.isValidSigner.selector;
         }
@@ -43,8 +43,9 @@ contract SimpleERC6551Account is IERC165, IERC1271, IERC6551Account, IERC6551Exe
     }
 
     function isValidSignature(bytes32 hash, bytes memory signature)
-        external
+        public
         view
+        virtual
         returns (bytes4 magicValue)
     {
         bool isValid = SignatureChecker.isValidSignatureNow(owner(), hash, signature);
@@ -74,14 +75,14 @@ contract SimpleERC6551Account is IERC165, IERC1271, IERC6551Account, IERC6551Exe
         return abi.decode(footer, (uint256, address, uint256));
     }
 
-    function owner() public view returns (address) {
+    function owner() public view virtual returns (address) {
         (uint256 chainId, address tokenContract, uint256 tokenId) = token();
         if (chainId != block.chainid) return address(0);
 
         return IERC721(tokenContract).ownerOf(tokenId);
     }
 
-    function _isValidSigner(address signer) internal view returns (bool) {
+    function _isValidSigner(address signer) internal view virtual returns (bool) {
         return signer == owner();
     }
 }
