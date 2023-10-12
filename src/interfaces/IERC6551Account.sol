@@ -25,11 +25,7 @@ interface IERC6551Account {
     function token()
         external
         view
-        returns (
-            uint256 chainId,
-            address tokenContract,
-            uint256 tokenId
-        );
+        returns (uint256 chainId, address tokenContract, uint256 tokenId);
 
     /**
      * @dev Returns a value that SHOULD be modified each time the account changes state

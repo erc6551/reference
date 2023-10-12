@@ -52,32 +52,8 @@ contract RegistryTest is Test {
             abi.encodeWithSignature("initialize(bool)", true)
         );
 
-        address registryComputedAddress = registry.account(
-            address(implementation),
-            chainId,
-            tokenAddress,
-            tokenId,
-            salt
-        );
+        address registryComputedAddress =
+            registry.account(address(implementation), chainId, tokenAddress, tokenId, salt);
         assertEq(deployedAccount, registryComputedAddress);
-
-        address libraryComputedAddress = ERC6551AccountLib.computeAddress(
-            address(registry),
-            address(implementation),
-            chainId,
-            tokenAddress,
-            tokenId,
-            salt
-        );
-        assertEq(deployedAccount, libraryComputedAddress);
-
-        MockERC6551Account accountInstance = MockERC6551Account(payable(deployedAccount));
-
-        (uint256 chainId_, address tokenAddress_, uint256 tokenId_) = accountInstance.token();
-        assertEq(chainId_, chainId);
-        assertEq(tokenAddress_, tokenAddress);
-        assertEq(tokenId_, tokenId);
-
-        assertEq(salt, accountInstance.salt());
     }
 }

@@ -9,6 +9,9 @@ import "./lib/ERC6551BytecodeLib.sol";
 contract ERC6551Registry is IERC6551Registry {
     error AccountCreationFailed();
 
+    /**
+     * @dev {See IERC6551Registry-createAccount}
+     */
     function createAccount(
         address implementation,
         uint256 chainId,
@@ -18,11 +21,7 @@ contract ERC6551Registry is IERC6551Registry {
         bytes calldata initData
     ) external returns (address) {
         bytes memory code = ERC6551BytecodeLib.getCreationCode(
-            implementation,
-            chainId,
-            tokenContract,
-            tokenId,
-            salt
+            implementation, chainId, tokenContract, tokenId, salt
         );
 
         address _account = Create2.computeAddress(bytes32(salt), keccak256(code));
@@ -50,6 +49,9 @@ contract ERC6551Registry is IERC6551Registry {
         return _account;
     }
 
+    /**
+     * @dev {See IERC6551Registry-account}
+     */
     function account(
         address implementation,
         uint256 chainId,
@@ -59,11 +61,7 @@ contract ERC6551Registry is IERC6551Registry {
     ) external view returns (address) {
         bytes32 bytecodeHash = keccak256(
             ERC6551BytecodeLib.getCreationCode(
-                implementation,
-                chainId,
-                tokenContract,
-                tokenId,
-                salt
+                implementation, chainId, tokenContract, tokenId, salt
             )
         );
 
