@@ -3,6 +3,7 @@ pragma solidity ^0.8.0;
 
 import "forge-std/Test.sol";
 
+import {ERC6551Registry as EIPInlinedRegistry} from "../src/eip/ERC6551Registry.sol";
 import "../src/ERC6551Registry.sol";
 import "../src/lib/ERC6551AccountLib.sol";
 import "./mocks/MockERC721.sol";
@@ -36,17 +37,24 @@ contract RegistryTest is Test {
         uint256 tokenId = 300;
         bytes32 salt = bytes32(uint256(400));
 
-         address deployedAccount = registry.createAccount(
-            address(implementation),
-            salt,
-            chainId,
-            tokenAddress,
-            tokenId
-        );
+        address deployedAccount =
+            registry.createAccount(address(implementation), salt, chainId, tokenAddress, tokenId);
 
         address registryComputedAddress =
             registry.account(address(implementation), salt, chainId, tokenAddress, tokenId);
 
         assertEq(deployedAccount, registryComputedAddress);
+    }
+
+    function testCompiledAddressEqualsInlinedAddress() public {
+        bytes32 salt = 0x6551655165516551655165516551655165516551655165516551655165516551;
+        address factory = 0x4e59b44847b379578588920cA78FbF26c0B4956C;
+
+        address eipRegistry =
+            Create2.computeAddress(salt, keccak256(type(EIPInlinedRegistry).creationCode), factory);
+        address sourceRegistry =
+            Create2.computeAddress(salt, keccak256(type(ERC6551Registry).creationCode), factory);
+
+        assertEq(eipRegistry, sourceRegistry);
     }
 }

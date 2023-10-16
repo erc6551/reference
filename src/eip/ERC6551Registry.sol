@@ -1,14 +1,54 @@
-// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/utils/Create2.sol";
-import "./interfaces/IERC6551Registry.sol";
-import "./lib/ERC6551BytecodeLib.sol";
+
+interface IERC6551Registry {
+    event ERC6551AccountCreated(
+        address account,
+        address indexed implementation,
+        bytes32 salt,
+        uint256 chainId,
+        address indexed tokenContract,
+        uint256 indexed tokenId
+    );
+
+    error AccountCreationFailed();
+
+    function createAccount(
+        address implementation,
+        bytes32 salt,
+        uint256 chainId,
+        address tokenContract,
+        uint256 tokenId
+    ) external returns (address);
+
+    function account(
+        address implementation,
+        bytes32 salt,
+        uint256 chainId,
+        address tokenContract,
+        uint256 tokenId
+    ) external view returns (address);
+}
+
+library ERC6551BytecodeLib {
+    function getCreationCode(
+        address implementation_,
+        bytes32 salt_,
+        uint256 chainId_,
+        address tokenContract_,
+        uint256 tokenId_
+    ) internal pure returns (bytes memory) {
+        return abi.encodePacked(
+            hex"3d60ad80600a3d3981f3363d3d373d3d3d363d73",
+            implementation_,
+            hex"5af43d82803e903d91602b57fd5bf3",
+            abi.encode(salt_, chainId_, tokenContract_, tokenId_)
+        );
+    }
+}
 
 contract ERC6551Registry is IERC6551Registry {
-    /**
-     * @dev {See IERC6551Registry-createAccount}
-     */
     function createAccount(
         address implementation,
         bytes32 salt,
@@ -35,9 +75,6 @@ contract ERC6551Registry is IERC6551Registry {
         return _account;
     }
 
-    /**
-     * @dev {See IERC6551Registry-account}
-     */
     function account(
         address implementation,
         bytes32 salt,

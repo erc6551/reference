@@ -4,6 +4,7 @@ out = 'out'
 libs = ['lib']
 
 solc_version = "0.8.17"
+bytecode_hash = "none"
 optimizer = true
 optimizer_runs = 200
 
