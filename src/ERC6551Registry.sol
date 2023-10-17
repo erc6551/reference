@@ -119,19 +119,33 @@ contract ERC6551Registry is IERC6551Registry {
 
         address deployment = ERC6551BytecodeLib.computeAddress(salt, keccak256(code), address(this));
 
-        if (deployment.code.length != 0) return deployment;
-
         assembly {
-            deployment := create2(0, add(code, 0x20), mload(code), salt)
+            if iszero(extcodesize(deployment)) {
+                deployment := create2(0, add(code, 0x20), mload(code), salt)
+                // Revert if the deployment fails
+                if iszero(deployment) {
+                    mstore(0x00, 0x20188a59) // `AccountCreationFailed()`
+                    revert(0x1c, 0x04)
+                }
+                let m := mload(0x40) // Grab the free memory pointer
+                mstore(m, deployment)
+                mstore(add(m, 0x20), salt)
+                mstore(add(m, 0x40), chainId)
+                // Emit the ERC6551AccountCreated event
+                log4(
+                    m,
+                    0x60,
+                    // `ERC6551AccountCreated(address,address,bytes32,uint256,address,uint256)`
+                    0x79f19b3655ee38b1ce526556b7731a20c8f218fbda4a3990b6cc4172fdf88722,
+                    shr(96, shl(96, implementation)),
+                    shr(96, shl(96, tokenContract)),
+                    tokenId
+                )
+                return(m, 0x20)
+            }
+            mstore(0x00, shr(96, shl(96, deployment)))
+            return(0x00, 0x20)
         }
-
-        if (deployment == address(0)) revert AccountCreationFailed();
-
-        emit ERC6551AccountCreated(
-            deployment, implementation, salt, chainId, tokenContract, tokenId
-        );
-
-        return deployment;
     }
 
     /**

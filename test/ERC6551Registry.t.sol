@@ -15,6 +15,15 @@ contract RegistryTest is Test {
     ERC6551Registry public registry;
     MockERC6551Account public implementation;
 
+    event ERC6551AccountCreated(
+        address account,
+        address indexed implementation,
+        bytes32 salt,
+        uint256 chainId,
+        address indexed tokenContract,
+        uint256 indexed tokenId
+    );
+
     function setUp() public {
         registry = new ERC6551Registry();
         implementation = new MockERC6551Account();
@@ -46,15 +55,26 @@ contract RegistryTest is Test {
         assertEq(deployedAccount, registryComputedAddress);
     }
 
-    function testCompiledAddressEqualsInlinedAddress() public {
-        bytes32 salt = 0x6551655165516551655165516551655165516551655165516551655165516551;
-        address factory = 0x4e59b44847b379578588920cA78FbF26c0B4956C;
+    function testDeploy2() public {
+        uint256 chainId = 100;
+        address tokenAddress = address(200);
+        uint256 tokenId = 300;
+        bytes32 salt = bytes32(uint256(400));
 
-        address eipRegistry =
-            Create2.computeAddress(salt, keccak256(type(EIPInlinedRegistry).creationCode), factory);
-        address sourceRegistry =
-            Create2.computeAddress(salt, keccak256(type(ERC6551Registry).creationCode), factory);
+        address account =
+            registry.account(address(implementation), salt, chainId, tokenAddress, tokenId);
 
-        assertEq(eipRegistry, sourceRegistry);
+        vm.expectEmit(true, true, true, true);
+        emit ERC6551AccountCreated(
+            account, address(implementation), salt, chainId, tokenAddress, tokenId
+        );
+
+        address deployedAccount =
+            registry.createAccount(address(implementation), salt, chainId, tokenAddress, tokenId);
+        assertEq(deployedAccount, account);
+
+        deployedAccount =
+            registry.createAccount(address(implementation), salt, chainId, tokenAddress, tokenId);
+        assertEq(deployedAccount, account);
     }
 }
