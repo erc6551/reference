@@ -60,21 +60,21 @@ library ERC6551BytecodeLib {
      * @return result The creation code of the token bound account
      */
     function getCreationCode(
-        address implementation_,
-        bytes32 salt_,
-        uint256 chainId_,
-        address tokenContract_,
-        uint256 tokenId_
+        address implementation,
+        bytes32 salt,
+        uint256 chainId,
+        address tokenContract,
+        uint256 tokenId
     ) internal pure returns (bytes memory result) {
         assembly {
             result := mload(0x40) // Grab the free memory pointer.
             // Layout the variables and bytecode backwards.
-            mstore(add(result, 0xb7), tokenId_)
-            mstore(add(result, 0x97), shr(96, shl(96, tokenContract_)))
-            mstore(add(result, 0x77), chainId_)
-            mstore(add(result, 0x57), salt_)
+            mstore(add(result, 0xb7), tokenId)
+            mstore(add(result, 0x97), shr(96, shl(96, tokenContract)))
+            mstore(add(result, 0x77), chainId)
+            mstore(add(result, 0x57), salt)
             mstore(add(result, 0x37), 0x5af43d82803e903d91602b57fd5bf3)
-            mstore(add(result, 0x28), implementation_)
+            mstore(add(result, 0x28), implementation)
             mstore(add(result, 0x14), 0x3d60ad80600a3d3981f3363d3d373d3d3d363d73)
             mstore(result, 0xb7) // Store the length.
             mstore(0x40, add(result, 0xd7)) // Allocate the memory.
@@ -84,21 +84,20 @@ library ERC6551BytecodeLib {
     /**
      * @dev Returns the create2 address computed from `hash`, `salt`, `deployer`.
      *
-     * @return predicted The create2 address computed from `hash`, `salt`, `deployer`.
+     * @return result The create2 address computed from `hash`, `salt`, `deployer`.
      */
-    function predictDeterministicAddress(bytes32 hash, bytes32 salt, address deployer)
+    function computeAddress(bytes32 salt, bytes32 bytecodeHash, address deployer)
         internal
         pure
-        returns (address predicted)
+        returns (address result)
     {
         assembly {
-            // Compute and store the bytecode hash.
-            mstore8(0x00, 0xff) // Write the prefix.
-            mstore(0x35, hash)
-            mstore(0x01, shl(96, deployer))
-            mstore(0x15, salt)
-            predicted := keccak256(0x00, 0x55)
-            mstore(0x35, 0) // Restore the overwritten part of the free memory pointer.
+            result := mload(0x40) // Grab the free memory pointer.
+            mstore8(result, 0xff)
+            mstore(add(result, 0x35), bytecodeHash)
+            mstore(add(result, 0x01), shl(96, deployer))
+            mstore(add(result, 0x15), salt)
+            result := keccak256(result, 0x55)
         }
     }
 }
@@ -118,8 +117,7 @@ contract ERC6551Registry is IERC6551Registry {
             implementation, salt, chainId, tokenContract, tokenId
         );
 
-        address _account =
-            ERC6551BytecodeLib.predictDeterministicAddress(keccak256(code), salt, address(this));
+        address _account = ERC6551BytecodeLib.computeAddress(salt, keccak256(code), address(this));
 
         if (_account.code.length != 0) return _account;
 
@@ -150,6 +148,6 @@ contract ERC6551Registry is IERC6551Registry {
             )
         );
 
-        return ERC6551BytecodeLib.predictDeterministicAddress(bytecodeHash, salt, address(this));
+        return ERC6551BytecodeLib.computeAddress(salt, bytecodeHash, address(this));
     }
 }
