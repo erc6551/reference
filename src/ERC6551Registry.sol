@@ -82,9 +82,9 @@ library ERC6551BytecodeLib {
     }
 
     /**
-     * @dev Returns the create2 address computed from `hash`, `salt`, `deployer`.
+     * @dev Returns the create2 address computed from `salt`, `bytecodeHash`, `deployer`.
      *
-     * @return result The create2 address computed from `hash`, `salt`, `deployer`.
+     * @return result The create2 address computed from `salt`, `bytecodeHash`, `deployer`.
      */
     function computeAddress(bytes32 salt, bytes32 bytecodeHash, address deployer)
         internal
