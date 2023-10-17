@@ -117,19 +117,21 @@ contract ERC6551Registry is IERC6551Registry {
             implementation, salt, chainId, tokenContract, tokenId
         );
 
-        address _account = ERC6551BytecodeLib.computeAddress(salt, keccak256(code), address(this));
+        address deployment = ERC6551BytecodeLib.computeAddress(salt, keccak256(code), address(this));
 
-        if (_account.code.length != 0) return _account;
-
-        emit ERC6551AccountCreated(_account, implementation, salt, chainId, tokenContract, tokenId);
+        if (deployment.code.length != 0) return deployment;
 
         assembly {
-            _account := create2(0, add(code, 0x20), mload(code), salt)
+            deployment := create2(0, add(code, 0x20), mload(code), salt)
         }
 
-        if (_account == address(0)) revert AccountCreationFailed();
+        if (deployment == address(0)) revert AccountCreationFailed();
 
-        return _account;
+        emit ERC6551AccountCreated(
+            deployment, implementation, salt, chainId, tokenContract, tokenId
+        );
+
+        return deployment;
     }
 
     /**
@@ -142,12 +144,14 @@ contract ERC6551Registry is IERC6551Registry {
         address tokenContract,
         uint256 tokenId
     ) external view returns (address) {
-        bytes32 bytecodeHash = keccak256(
-            ERC6551BytecodeLib.getCreationCode(
-                implementation, salt, chainId, tokenContract, tokenId
-            )
+        return ERC6551BytecodeLib.computeAddress(
+            salt,
+            keccak256(
+                ERC6551BytecodeLib.getCreationCode(
+                    implementation, salt, chainId, tokenContract, tokenId
+                )
+            ),
+            address(this)
         );
-
-        return ERC6551BytecodeLib.computeAddress(salt, bytecodeHash, address(this));
     }
 }
