@@ -24,10 +24,7 @@ interface IERC6551Registry {
      *
      * If account has already been created, returns the account address without calling create2.
      *
-     * If initData is not empty and account has not yet been created, calls account with
-     * provided initData after creation.
-     *
-     * Emits ERC6551AccountCreated event
+     * Emits ERC6551AccountCreated event.
      *
      * @return account The address of the token bound account
      */
