@@ -2,7 +2,7 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/utils/Create2.sol";
-import {ERC6551BytecodeLib} from "../ERC6551Registry.sol";
+import "./ERC6551BytecodeLib.sol";
 
 library ERC6551AccountLib {
     function computeAddress(
@@ -41,7 +41,7 @@ library ERC6551AccountLib {
         (bytes32 _salt, uint256 chainId, address tokenContract, uint256 tokenId) = context(account);
 
         return account
-            == computeAddress(registry, _implementation, _salt, chainId, tokenContract, tokenId );
+            == computeAddress(registry, _implementation, _salt, chainId, tokenContract, tokenId);
     }
 
     function implementation(address account) internal view returns (address _implementation) {

@@ -4,7 +4,7 @@ pragma solidity ^0.8.13;
 import "forge-std/Script.sol";
 import "@openzeppelin/contracts/utils/Create2.sol";
 
-import "../src/eip/ERC6551Registry.sol";
+import "../src/ERC6551Registry.sol";
 
 contract ComputeRegistryAddress is Script {
     function run() external view {

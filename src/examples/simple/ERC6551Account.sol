@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
@@ -28,7 +29,7 @@ interface IERC6551Executable {
         returns (bytes memory);
 }
 
-contract ExampleERC6551Account is IERC165, IERC1271, IERC6551Account, IERC6551Executable {
+contract ERC6551Account is IERC165, IERC1271, IERC6551Account, IERC6551Executable {
     uint256 public state;
 
     receive() external payable {}
@@ -36,6 +37,7 @@ contract ExampleERC6551Account is IERC165, IERC1271, IERC6551Account, IERC6551Ex
     function execute(address to, uint256 value, bytes calldata data, uint8 operation)
         external
         payable
+        virtual
         returns (bytes memory result)
     {
         require(_isValidSigner(msg.sender), "Invalid signer");
@@ -53,7 +55,7 @@ contract ExampleERC6551Account is IERC165, IERC1271, IERC6551Account, IERC6551Ex
         }
     }
 
-    function isValidSigner(address signer, bytes calldata) public view returns (bytes4) {
+    function isValidSigner(address signer, bytes calldata) external view virtual returns (bytes4) {
         if (_isValidSigner(signer)) {
             return IERC6551Account.isValidSigner.selector;
         }
@@ -62,8 +64,9 @@ contract ExampleERC6551Account is IERC165, IERC1271, IERC6551Account, IERC6551Ex
     }
 
     function isValidSignature(bytes32 hash, bytes memory signature)
-        public
+        external
         view
+        virtual
         returns (bytes4 magicValue)
     {
         bool isValid = SignatureChecker.isValidSignatureNow(owner(), hash, signature);
@@ -75,13 +78,13 @@ contract ExampleERC6551Account is IERC165, IERC1271, IERC6551Account, IERC6551Ex
         return bytes4(0);
     }
 
-    function supportsInterface(bytes4 interfaceId) external pure returns (bool) {
+    function supportsInterface(bytes4 interfaceId) external pure virtual returns (bool) {
         return interfaceId == type(IERC165).interfaceId
             || interfaceId == type(IERC6551Account).interfaceId
             || interfaceId == type(IERC6551Executable).interfaceId;
     }
 
-    function token() public view returns (uint256, address, uint256) {
+    function token() public view virtual returns (uint256, address, uint256) {
         bytes memory footer = new bytes(0x60);
 
         assembly {
@@ -91,14 +94,14 @@ contract ExampleERC6551Account is IERC165, IERC1271, IERC6551Account, IERC6551Ex
         return abi.decode(footer, (uint256, address, uint256));
     }
 
-    function owner() public view returns (address) {
+    function owner() public view virtual returns (address) {
         (uint256 chainId, address tokenContract, uint256 tokenId) = token();
         if (chainId != block.chainid) return address(0);
 
         return IERC721(tokenContract).ownerOf(tokenId);
     }
 
-    function _isValidSigner(address signer) internal view returns (bool) {
+    function _isValidSigner(address signer) internal view virtual returns (bool) {
         return signer == owner();
     }
 }
