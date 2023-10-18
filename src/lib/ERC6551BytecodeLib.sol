@@ -23,7 +23,7 @@ library ERC6551BytecodeLib {
             mstore(add(result, 0x57), salt)
             mstore(add(result, 0x37), 0x5af43d82803e903d91602b57fd5bf3)
             mstore(add(result, 0x28), implementation)
-            mstore(add(result, 0x14), 0x3d60ad80600a3d3981f3363d3d373d3d3d363d73)
+            mstore(add(result, 0x14), 0x60ad80600a3d396000f3363d3d373d3d3d363d73)
             mstore(result, 0xb7) // Store the length
             mstore(0x40, add(result, 0xd7)) // Allocate the memory
         }

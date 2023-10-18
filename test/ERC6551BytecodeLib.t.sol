@@ -18,7 +18,7 @@ contract ERC6551AccountLibTest is Test {
             implementation, salt, chainId, tokenContract, tokenId
         );
         bytes memory expected = abi.encodePacked(
-            hex"3d60ad80600a3d3981f3363d3d373d3d3d363d73",
+            hex"60ad80600a3d396000f3363d3d373d3d3d363d73",
             implementation,
             hex"5af43d82803e903d91602b57fd5bf3",
             abi.encode(salt, chainId, tokenContract, tokenId)
