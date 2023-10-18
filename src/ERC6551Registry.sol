@@ -146,12 +146,12 @@ contract ERC6551Registry is IERC6551Registry {
             // Copy bytecode + constant data to memory
             calldatacopy(0x8c, 0x24, 0x80) // salt, chainId, tokenContract, tokenId
             mstore(0x6c, 0x5af43d82803e903d91602b57fd5bf3) // ERC-1167 footer
-            mstore(0x5d, implementation)
+            mstore(0x5d, implementation) // implementation
             mstore(0x49, 0x3d60ad80600a3d3981f3363d3d373d3d3d363d73) // ERC-1167 constructor + header
 
             // Copy create2 computation data to memory
             mstore(0x35, keccak256(0x55, 0xb7)) // keccak256(bytedcode)
-            mstore(0x15, salt)
+            mstore(0x15, salt) // salt
             mstore(0x01, shl(96, address())) // registry address
             mstore8(0x00, 0xff) // 0xFF
 
