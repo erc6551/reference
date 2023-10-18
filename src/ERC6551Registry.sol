@@ -95,7 +95,7 @@ contract ERC6551Registry is IERC6551Registry {
             // Compute account address
             let computed := keccak256(0x00, 0x55)
 
-            // Deploy and returns the account address if the account has not been deployed
+            // If the account has not yet been deployed
             if iszero(extcodesize(computed)) {
                 // Deploy account contract
                 let deployed := create2(0, 0x55, 0xb7, salt)
