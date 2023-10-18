@@ -3,7 +3,6 @@ pragma solidity ^0.8.0;
 
 import "forge-std/Test.sol";
 
-import {ERC6551Registry as EIPInlinedRegistry} from "../src/eip/ERC6551Registry.sol";
 import "../src/ERC6551Registry.sol";
 import "../src/lib/ERC6551AccountLib.sol";
 import "./mocks/MockERC721.sol";
