@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 import "forge-std/Test.sol";
 
 import "@openzeppelin/contracts/utils/Create2.sol";
-import "../src/ERC6551Registry.sol";
+import "../src/lib/ERC6551BytecodeLib.sol";
 
 contract ERC6551AccountLibTest is Test {
     function testERC6551BytecodeLibDifferential(
