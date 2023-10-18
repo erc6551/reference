@@ -2,7 +2,11 @@
 
 This repository contains the reference implementation of [ERC-6551](https://eips.ethereum.org/EIPS/eip-6551).
 
-**This project is under active development and may undergo changes until ERC-6551 is finalized.** For the most recently deployed version of these contracts, see the [v0.2.0](https://github.com/erc6551/reference/releases/tag/v0.2.0) release. We recommend this version for any production usage.
+**This project is under active development and may undergo changes until ERC-6551 is finalized.**
+
+The current ERC6551Registry address is `0x8deDFee9BEEe2D64817Dd8dB8cff138C468Bd3Ef`.
+
+For the most recently deployed version of these contracts, see the [v0.3.0](https://github.com/erc6551/reference/releases/tag/v0.3.0) release. We recommend this version for any production usage.
 
 ## Using as a Dependency
 
@@ -40,7 +44,6 @@ forge test
 ```
 
 For more information on writing and running tests, refer to the [Foundry testing guide](https://github.com/foundry-rs/book/blob/master/src/forge/writing-tests.md).
-
 
 ## History
 

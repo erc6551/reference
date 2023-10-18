@@ -3,7 +3,7 @@ pragma solidity ^0.8.4;
 
 library ERC6551BytecodeLib {
     /**
-     * @dev Returns the creation code of the token bound account for a non-fungible token
+     * @dev Returns the creation code of the token bound account for a non-fungible token.
      *
      * @return result The creation code of the token bound account
      */
@@ -30,7 +30,7 @@ library ERC6551BytecodeLib {
     }
 
     /**
-     * @dev Returns the create2 address computed from `salt`, `bytecodeHash`, `deployer`
+     * @dev Returns the create2 address computed from `salt`, `bytecodeHash`, `deployer`.
      *
      * @return result The create2 address computed from `salt`, `bytecodeHash`, `deployer`
      */
