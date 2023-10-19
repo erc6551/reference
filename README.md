@@ -4,7 +4,7 @@ This repository contains the reference implementation of [ERC-6551](https://eips
 
 **This project is under active development and may undergo changes until ERC-6551 is finalized.**
 
-The current ERC6551Registry address is `0x8deDFee9BEEe2D64817Dd8dB8cff138C468Bd3Ef`.
+The current ERC6551Registry address is `0x284be69BaC8C983a749956D7320729EB24bc75f9`.
 
 For the most recently deployed version of these contracts, see the [v0.3.0](https://github.com/erc6551/reference/releases/tag/v0.3.0) release. We recommend this version for any production usage.
 
