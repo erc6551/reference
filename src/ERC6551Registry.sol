@@ -85,7 +85,7 @@ contract ERC6551Registry is IERC6551Registry {
 
             // Copy create2 computation data to memory
             mstore8(0x00, 0xff) // 0xFF
-            mstore(0x35, keccak256(0x55, 0xb7)) // keccak256(bytedcode)
+            mstore(0x35, keccak256(0x55, 0xb7)) // keccak256(bytecode)
             mstore(0x01, shl(96, address())) // registry address
             mstore(0x15, salt) // salt
 
@@ -148,7 +148,7 @@ contract ERC6551Registry is IERC6551Registry {
 
             // Copy create2 computation data to memory
             mstore8(0x00, 0xff) // 0xFF
-            mstore(0x35, keccak256(0x55, 0xb7)) // keccak256(bytedcode)
+            mstore(0x35, keccak256(0x55, 0xb7)) // keccak256(bytecode)
             mstore(0x01, shl(96, address())) // registry address
             mstore(0x15, salt) // salt
 
