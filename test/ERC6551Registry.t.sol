@@ -76,4 +76,19 @@ contract RegistryTest is Test {
             registry.createAccount(address(implementation), salt, chainId, tokenAddress, tokenId);
         assertEq(deployedAccount, account);
     }
+
+    function testDeployFuzz(
+        address _implementation,
+        uint256 chainId,
+        address tokenAddress,
+        uint256 tokenId,
+        bytes32 salt
+    ) public {
+        address account = registry.account(_implementation, salt, chainId, tokenAddress, tokenId);
+
+        address deployedAccount =
+            registry.createAccount(_implementation, salt, chainId, tokenAddress, tokenId);
+
+        assertEq(deployedAccount, account);
+    }
 }
