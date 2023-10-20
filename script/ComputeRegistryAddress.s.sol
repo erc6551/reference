@@ -8,7 +8,7 @@ import "../src/ERC6551Registry.sol";
 
 contract ComputeRegistryAddress is Script {
     function run() external view {
-        bytes32 salt = 0x6551655165516551655165516551655165516551655165516551655165516551;
+        bytes32 salt = 0x0000000000000000000000000000000000000000fd8eb4e1dca713016c518e31;
         address factory = 0x4e59b44847b379578588920cA78FbF26c0B4956C;
 
         address registry =

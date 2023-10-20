@@ -11,7 +11,7 @@ contract DeployRegistry is Script {
         vm.startBroadcast();
 
         new ERC6551Registry{
-            salt: 0x6551655165516551655165516551655165516551655165516551655165516551
+            salt: 0x0000000000000000000000000000000000000000fd8eb4e1dca713016c518e31
         }();
 
         vm.stopBroadcast();
