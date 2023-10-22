@@ -1,12 +1,15 @@
 {
-  "name": "erc6551-reference",
-  "version": "0.2.1",
+  "name": "erc6551",
+  "version": "0.3.3",
   "scripts": {
     "test": "forge test",
     "format": "forge fmt",
     "lint": "solhint -w 0 'contracts/**/*.sol'"
   },
-  "dependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/erc6551/reference.git"
+  },
   "devDependencies": {
     "solhint": "^3.3.7"
   }
