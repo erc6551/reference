@@ -58,3 +58,11 @@ forge test
 ```
 
 For more information on writing and running tests, refer to the [Foundry testing guide](https://github.com/foundry-rs/book/blob/master/src/forge/writing-tests.md).
+
+
+## History
+
+Version 0.3.x introduces breaking changes in IERC6551Registry.
+
+More details about the history in the [CHANGELOG](./CHANGELOG.md).
+
