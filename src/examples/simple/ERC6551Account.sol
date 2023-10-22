@@ -35,7 +35,7 @@ contract ERC6551Account is IERC165, IERC1271, IERC6551Account, IERC6551Executabl
     receive() external payable {}
 
     function execute(address to, uint256 value, bytes calldata data, uint8 operation)
-        public
+        external
         payable
         virtual
         returns (bytes memory result)
@@ -55,7 +55,7 @@ contract ERC6551Account is IERC165, IERC1271, IERC6551Account, IERC6551Executabl
         }
     }
 
-    function isValidSigner(address signer, bytes calldata) public view virtual returns (bytes4) {
+    function isValidSigner(address signer, bytes calldata) external view virtual returns (bytes4) {
         if (_isValidSigner(signer)) {
             return IERC6551Account.isValidSigner.selector;
         }
@@ -64,7 +64,7 @@ contract ERC6551Account is IERC165, IERC1271, IERC6551Account, IERC6551Executabl
     }
 
     function isValidSignature(bytes32 hash, bytes memory signature)
-        public
+        external
         view
         virtual
         returns (bytes4 magicValue)

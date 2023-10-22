@@ -62,7 +62,7 @@ contract ERC6551AccountUpgradeable is
     /**
      * @dev Upgrades the implementation. Only the token owner can call this.
      */
-    function upgrade(address implementation_) public virtual {
+    function upgrade(address implementation_) external virtual {
         require(_isValidSigner(msg.sender), "Caller is not owner");
         require(implementation_ != address(0), "Invalid implementation address");
         ++state;
@@ -70,7 +70,7 @@ contract ERC6551AccountUpgradeable is
     }
 
     function isValidSignature(bytes32 hash, bytes memory signature)
-        public
+        external
         view
         virtual
         returns (bytes4 magicValue)
@@ -83,7 +83,7 @@ contract ERC6551AccountUpgradeable is
         return bytes4(0);
     }
 
-    function isValidSigner(address signer, bytes calldata) public view virtual returns (bytes4) {
+    function isValidSigner(address signer, bytes calldata) external view virtual returns (bytes4) {
         if (_isValidSigner(signer)) {
             return IERC6551Account.isValidSigner.selector;
         }
@@ -92,7 +92,7 @@ contract ERC6551AccountUpgradeable is
     }
 
     function onERC721Received(address, address, uint256 receivedTokenId, bytes memory)
-        public
+        external
         view
         virtual
         returns (bytes4)
@@ -102,7 +102,7 @@ contract ERC6551AccountUpgradeable is
     }
 
     function onERC1155Received(address, address, uint256, uint256, bytes memory)
-        public
+        external
         view
         virtual
         returns (bytes4)
@@ -116,7 +116,7 @@ contract ERC6551AccountUpgradeable is
         uint256[] memory,
         uint256[] memory,
         bytes memory
-    ) public pure virtual returns (bytes4) {
+    ) external pure virtual returns (bytes4) {
         return IERC1155Receiver.onERC1155BatchReceived.selector;
     }
 
