@@ -2,6 +2,6 @@
 
 cp README.md src/README.md
 cd src
-npm publish
+npm publish --tag beta
 rm README.md
 cd ..

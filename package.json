@@ -1,10 +1,11 @@
 {
   "name": "erc6551",
-  "version": "0.3.3",
+  "version": "0.3.1",
   "scripts": {
     "test": "forge test",
     "format": "forge fmt",
-    "lint": "solhint -w 0 'contracts/**/*.sol'"
+    "lint": "solhint -w 0 'contracts/**/*.sol'",
+    "publish-package": "script/publish.sh"
   },
   "repository": {
     "type": "git",

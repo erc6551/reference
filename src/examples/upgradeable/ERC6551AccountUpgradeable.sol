@@ -91,8 +91,7 @@ contract ERC6551AccountUpgradeable is
     }
 
     function onERC721Received(address, address, uint256 receivedTokenId, bytes memory)
-        external
-        view
+        public view virtual
         returns (bytes4)
     {
         _revertIfOwnershipCycle(msg.sender, receivedTokenId);
@@ -100,8 +99,7 @@ contract ERC6551AccountUpgradeable is
     }
 
     function onERC1155Received(address, address, uint256, uint256, bytes memory)
-        external
-        pure
+        public view virtual
         returns (bytes4)
     {
         return IERC1155Receiver.onERC1155Received.selector;
@@ -117,7 +115,7 @@ contract ERC6551AccountUpgradeable is
         return IERC1155Receiver.onERC1155BatchReceived.selector;
     }
 
-    function supportsInterface(bytes4 interfaceId) external pure returns (bool) {
+    function supportsInterface(bytes4 interfaceId) public pure virtual returns (bool) {
         return (
             interfaceId == type(IERC6551Account).interfaceId
                 || interfaceId == type(IERC6551Executable).interfaceId
@@ -130,11 +128,11 @@ contract ERC6551AccountUpgradeable is
     /**
      * @dev {See IERC6551Account-token}
      */
-    function token() public view override returns (uint256, address, uint256) {
+    function token() public view virtual override returns (uint256, address, uint256) {
         return ERC6551AccountLib.token();
     }
-    
-    function owner() public view returns (address) {
+
+    function owner() public view virtual returns (address) {
         (uint256 chainId, address contractAddress, uint256 tokenId) = token();
         if (chainId != block.chainid) return address(0);
         return IERC721(contractAddress).ownerOf(tokenId);
