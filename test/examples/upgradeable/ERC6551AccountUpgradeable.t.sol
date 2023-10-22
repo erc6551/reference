@@ -192,26 +192,33 @@ contract AccountProxyTest is Test {
         nft.mint(owner7, 700);
 
         vm.prank(owner1, owner1);
-        address account1 =
-            registry.createAccount(address(implementation), bytes32(0), block.chainid, address(nft), 100);
+        address account1 = registry.createAccount(
+            address(implementation), bytes32(0), block.chainid, address(nft), 100
+        );
         vm.prank(owner2, owner2);
-        address account2 =
-            registry.createAccount(address(implementation), bytes32(0), block.chainid, address(nft), 200);
+        address account2 = registry.createAccount(
+            address(implementation), bytes32(0), block.chainid, address(nft), 200
+        );
         vm.prank(owner3, owner3);
-        address account3 =
-            registry.createAccount(address(implementation), bytes32(0), block.chainid, address(nft), 300);
+        address account3 = registry.createAccount(
+            address(implementation), bytes32(0), block.chainid, address(nft), 300
+        );
         vm.prank(owner4, owner4);
-        address account4 =
-            registry.createAccount(address(implementation), bytes32(0), block.chainid, address(nft), 400);
+        address account4 = registry.createAccount(
+            address(implementation), bytes32(0), block.chainid, address(nft), 400
+        );
         vm.prank(owner5, owner5);
-        address account5 =
-            registry.createAccount(address(implementation), bytes32(0), block.chainid, address(nft), 500);
+        address account5 = registry.createAccount(
+            address(implementation), bytes32(0), block.chainid, address(nft), 500
+        );
         vm.prank(owner6, owner6);
-        address account6 =
-            registry.createAccount(address(implementation), bytes32(0), block.chainid, address(nft), 600);
+        address account6 = registry.createAccount(
+            address(implementation), bytes32(0), block.chainid, address(nft), 600
+        );
         vm.prank(owner7, owner7);
-        address account7 =
-            registry.createAccount(address(implementation), bytes32(0), block.chainid, address(nft), 700);
+        address account7 = registry.createAccount(
+            address(implementation), bytes32(0), block.chainid, address(nft), 700
+        );
 
         vm.prank(owner1);
         nft.safeTransferFrom(owner1, account2, 100);

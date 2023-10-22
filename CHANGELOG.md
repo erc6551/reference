@@ -6,7 +6,7 @@
 - Fix typos in comments
 - Changed pragma to ^0.8.4 as that is the minimum for custom errors
 - Create2.computeAddress -> ERC6551BytecodeLib.computeAddress to remove registry dependency on OpenZeppelin
-- Inluded bytecode_hash in the compilation config as per default to prevent comment vandalism
+- Included bytecode_hash in the compilation config as per default to prevent comment vandalism
 
 ## v.3.0 (breaking changes)
 

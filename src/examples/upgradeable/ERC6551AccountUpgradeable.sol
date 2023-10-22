@@ -71,7 +71,8 @@ contract ERC6551AccountUpgradeable is
 
     function isValidSignature(bytes32 hash, bytes memory signature)
         public
-        view virtual
+        view
+        virtual
         returns (bytes4 magicValue)
     {
         bool isValid = SignatureChecker.isValidSignatureNow(owner(), hash, signature);
@@ -91,7 +92,9 @@ contract ERC6551AccountUpgradeable is
     }
 
     function onERC721Received(address, address, uint256 receivedTokenId, bytes memory)
-        public view virtual
+        public
+        view
+        virtual
         returns (bytes4)
     {
         _revertIfOwnershipCycle(msg.sender, receivedTokenId);
@@ -99,7 +102,9 @@ contract ERC6551AccountUpgradeable is
     }
 
     function onERC1155Received(address, address, uint256, uint256, bytes memory)
-        public view virtual
+        public
+        view
+        virtual
         returns (bytes4)
     {
         return IERC1155Receiver.onERC1155Received.selector;
@@ -149,7 +154,8 @@ contract ERC6551AccountUpgradeable is
      */
     function _revertIfOwnershipCycle(address receivedTokenAddress, uint256 receivedTokenId)
         internal
-        view virtual
+        view
+        virtual
     {
         (uint256 _chainId, address _contractAddress, uint256 _tokenId) = token();
         require(
