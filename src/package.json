@@ -1,8 +1,12 @@
 {
-  "name": "@erc6551/reference",
-  "version": "0.2.1",
+  "name": "erc6551",
+  "version": "0.3.3",
   "files": [
-    "**/*.sol"
+    "**/*.sol",
+    "README.md"
   ],
-  "description": "ERC-6551 reference implementation"
+  "description": "ERC-6551 reference implementation",
+  "scripts": {
+    "prepublishOnly": "../script/verify-package-json-in-sync.js"
+  }
 }

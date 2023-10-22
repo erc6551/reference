@@ -10,6 +10,8 @@ For the most recently deployed version of these contracts, see the [v0.3.0](http
 
 ## Using as a Dependency
 
+### Foundry
+
 If you want to use `erc6551/reference` as a dependency in another project, you can add it using `forge install`:
 
 ```sh
@@ -17,6 +19,18 @@ forge install erc6551=erc6551/reference
 ```
 
 This will add `erc6551/reference` as a git submodule in your project. For more information on managing dependencies, refer to the [Foundry dependencies guide](https://github.com/foundry-rs/book/blob/master/src/projects/dependencies.md).
+
+### Hardhat
+
+```sh
+npm install erc6551 @openzeppelin/contracts
+```
+
+and use, for example, as
+
+```
+import "erc6551/interfaces/IERC6551Account.sol";
+```
 
 ## Development Setup
 
@@ -44,9 +58,3 @@ forge test
 ```
 
 For more information on writing and running tests, refer to the [Foundry testing guide](https://github.com/foundry-rs/book/blob/master/src/forge/writing-tests.md).
-
-## History
-
-**0.2.1**
-
-- Making examples' functions `virtual` and `public` so that the examples can be used as a base for more advanced contracts
