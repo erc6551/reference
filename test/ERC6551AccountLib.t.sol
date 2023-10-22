@@ -26,9 +26,8 @@ contract ERC6551AccountLibTest is Test {
         bytes32 salt = bytes32(uint256(400));
         address deployedAccount;
 
-        deployedAccount = registry.createAccount(
-            address(implementation), salt, chainId, tokenAddress, tokenId
-        );
+        deployedAccount =
+            registry.createAccount(address(implementation), salt, chainId, tokenAddress, tokenId);
 
         address libraryComputedAddress = ERC6551AccountLib.computeAddress(
             address(registry), address(implementation), salt, chainId, tokenAddress, tokenId
@@ -54,7 +53,12 @@ contract ERC6551AccountLibTest is Test {
         _salt = ERC6551AccountLib.salt(deployedAccount);
         assertEq(_salt, salt);
 
-        assertEq(ERC6551AccountLib.isERC6551Account(deployedAccount, address(implementation), address(registry)), true);
+        assertEq(
+            ERC6551AccountLib.isERC6551Account(
+                deployedAccount, address(implementation), address(registry)
+            ),
+            true
+        );
 
         MockERC6551Account accountInstance = MockERC6551Account(payable(deployedAccount));
 

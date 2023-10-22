@@ -4,7 +4,8 @@
   "scripts": {
     "test": "forge test",
     "format": "forge fmt",
-    "lint": "solhint -w 0 'contracts/**/*.sol'"
+    "lint": "solhint -w 0 'contracts/**/*.sol'",
+    "publish-package": "script/publish.sh"
   },
   "repository": {
     "type": "git",
