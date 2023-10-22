@@ -1,6 +1,6 @@
 {
   "name": "erc6551",
-  "version": "0.3.1-beta.3",
+  "version": "0.3.1",
   "scripts": {
     "test": "forge test",
     "format": "forge fmt",
