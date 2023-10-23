@@ -21,4 +21,14 @@ contract ERC6551AccountProxy is Proxy, ERC1967Upgrade {
 
         return implementation;
     }
+
+    function _beforeFallback() internal virtual override {
+        super._beforeFallback();
+        if (msg.data.length == 0) {
+            if (ERC1967Upgrade._getImplementation() == address(0)) {
+                ERC1967Upgrade._upgradeTo(defaultImplementation);
+                _delegate(defaultImplementation);
+            }
+        }
+    }
 }
