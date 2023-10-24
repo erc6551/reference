@@ -267,6 +267,36 @@ contract AccountProxyTest is Test {
         IERC6551Executable(account).execute(owner, 0, "", 0);
     }
 
+    function testProxyInitializeERC1967ImplementationSlot() public {
+        address owner = vm.addr(1);
+        uint256 tokenId = 100;
+        bytes32 salt = bytes32(uint256(200));
+
+        nft.mint(owner, tokenId);
+
+        vm.prank(owner, owner);
+        address account =
+            registry.createAccount(address(proxy), salt, block.chainid, address(nft), tokenId);
+
+        // Check that even if the implementation is not in storage, the proxy still can function.
+        assertEq(ERC6551AccountUpgradeable(payable(account)).owner(), owner);
+
+        bytes32 rawImplementation =
+            vm.load(account, 0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc);
+
+        assertEq(address(uint160(uint256(rawImplementation))), address(0));
+
+        // Send ETH to initialize.
+        (bool success, ) = payable(account).call{value: 0}("");
+        assertTrue(success);
+
+        rawImplementation =
+            vm.load(account, 0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc);
+
+        assertEq(address(uint160(uint256(rawImplementation))), address(implementation));
+        
+    }
+
     function testERC721Receive() public {
         address owner = vm.addr(1);
         uint256 tokenId = 100;
