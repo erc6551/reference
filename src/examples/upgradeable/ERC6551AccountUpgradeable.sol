@@ -11,6 +11,7 @@ import "@openzeppelin/contracts/utils/StorageSlot.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import "@openzeppelin/contracts/token/ERC1155/IERC1155Receiver.sol";
+import "@openzeppelin/contracts/token/ERC777/ERC777.sol";
 
 import "../../interfaces/IERC6551Account.sol";
 import "../../interfaces/IERC6551Executable.sol";
@@ -24,6 +25,7 @@ contract ERC6551AccountUpgradeable is
     IERC165,
     IERC721Receiver,
     IERC1155Receiver,
+    IERC777Recipient,
     IERC6551Account,
     IERC6551Executable,
     IERC1271
@@ -120,13 +122,20 @@ contract ERC6551AccountUpgradeable is
         return IERC1155Receiver.onERC1155BatchReceived.selector;
     }
 
+    function tokensReceived(address, address, address, uint256, bytes calldata, bytes calldata)
+    external
+    virtual
+    override
+    {}
+
     function supportsInterface(bytes4 interfaceId) public pure virtual returns (bool) {
         return (
             interfaceId == type(IERC6551Account).interfaceId
-                || interfaceId == type(IERC6551Executable).interfaceId
-                || interfaceId == type(IERC1155Receiver).interfaceId
-                || interfaceId == type(IERC721Receiver).interfaceId
-                || interfaceId == type(IERC165).interfaceId
+            || interfaceId == type(IERC6551Executable).interfaceId
+            || interfaceId == type(IERC1155Receiver).interfaceId
+            || interfaceId == type(IERC721Receiver).interfaceId
+            || interfaceId == type(IERC777Recipient).interfaceId
+            || interfaceId == type(IERC165).interfaceId
         );
     }
 

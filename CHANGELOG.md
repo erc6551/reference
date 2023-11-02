@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.3.2
+
+- Add support for ERC-777 tokens
+
 ## v0.3.1
 
 - Prepare the repo to be published to NPM as `erc6551`, replacing the version published by Cruna (https://github.com/cruna-cc/erc6551)
