@@ -5,7 +5,8 @@
     "test": "forge test",
     "format": "forge fmt",
     "lint": "solhint -w 0 'contracts/**/*.sol'",
-    "publish-package": "script/publish.sh"
+    "publish-package": "script/publish.sh",
+    "prepublishOnly": "echo 'ERROR: Use script/publish.sh to publish' && exit 1"
   },
   "repository": {
     "type": "git",
