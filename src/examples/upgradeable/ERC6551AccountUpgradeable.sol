@@ -123,19 +123,19 @@ contract ERC6551AccountUpgradeable is
     }
 
     function tokensReceived(address, address, address, uint256, bytes calldata, bytes calldata)
-    external
-    virtual
-    override
+        external
+        virtual
+        override
     {}
 
     function supportsInterface(bytes4 interfaceId) public pure virtual returns (bool) {
         return (
             interfaceId == type(IERC6551Account).interfaceId
-            || interfaceId == type(IERC6551Executable).interfaceId
-            || interfaceId == type(IERC1155Receiver).interfaceId
-            || interfaceId == type(IERC721Receiver).interfaceId
-            || interfaceId == type(IERC777Recipient).interfaceId
-            || interfaceId == type(IERC165).interfaceId
+                || interfaceId == type(IERC6551Executable).interfaceId
+                || interfaceId == type(IERC1155Receiver).interfaceId
+                || interfaceId == type(IERC721Receiver).interfaceId
+                || interfaceId == type(IERC777Recipient).interfaceId
+                || interfaceId == type(IERC165).interfaceId
         );
     }
 

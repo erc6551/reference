@@ -287,14 +287,13 @@ contract AccountProxyTest is Test {
         assertEq(address(uint160(uint256(rawImplementation))), address(0));
 
         // Send ETH to initialize.
-        (bool success, ) = payable(account).call{value: 0}("");
+        (bool success,) = payable(account).call{value: 0}("");
         assertTrue(success);
 
         rawImplementation =
             vm.load(account, 0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc);
 
         assertEq(address(uint160(uint256(rawImplementation))), address(implementation));
-        
     }
 
     function testERC721Receive() public {
